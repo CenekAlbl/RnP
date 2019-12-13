@@ -26,7 +26,7 @@ include_directories(
 
 
 add_library(rnp SHARED
-  c++/r6p.cpp c++/sturm.cpp
+  c++/r6pDoubleLin.cpp c++/r6pSingleLin.cpp c++/sturm.cpp c++/utils.cpp
 )
 
 target_include_directories(rnp PRIVATE .)
@@ -51,7 +51,7 @@ if(Python_FOUND)
     configure_file(${SETUP_PY_IN} ${SETUP_PY})
 
     add_custom_command(OUTPUT "rnppy" 
-        COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/cython/setup.py build_ext --inplace --include-dirs "${CMAKE_SOURCE_DIR}/c++/" --library-dirs "${CMAKE_CURRENT_BINARY_DIR}"
+        COMMAND python3 ${CMAKE_SOURCE_DIR}/cython/setup.py build_ext --inplace --include-dirs "${CMAKE_SOURCE_DIR}/c++/" --library-dirs "${CMAKE_CURRENT_BINARY_DIR}"
         DEPENDS rnp)
 
     target_link_libraries (rnp)

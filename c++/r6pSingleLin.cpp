@@ -1,4 +1,4 @@
-#include "prepare.h"
+#include "prepareSingleLin.h"
 #include "utils.h"
 #include "danilevsky.h"
 #include "sturm.h"
@@ -69,7 +69,7 @@ std::vector<Eigen::Vector3d> solve_xy_from_AM(double * z, int nroots, Eigen::Mat
 	return sols;
 }
 
-int r6pDoubleLin(double * X, double * u, double * ud, int direction, double r0, int maxpow, double * vout, double * wout, double * Cout, double * tout) {
+int r6pSingleLin(double * X, double * u, double * ud, int direction, double r0, int maxpow, double * vout, double * wout, double * Cout, double * tout) {
 
 	Eigen::VectorXd coeffs(1260);
 	Eigen::MatrixXd CC = Eigen::MatrixXd::Zero(99, 163);
@@ -171,6 +171,6 @@ int r6pDoubleLin(double * X, double * u, double * ud, int direction, double r0, 
 
 }
 
-int r6pDoubleLin(double * X, double * u, int direction, double r0, int maxpow, double * Rout, double * wout, double * Cout, double * tout) {
-	return r6pDoubleLin(X, u, u, direction, r0, maxpow, Rout, wout, Cout, tout);
+int r6pSingleLin(double * X, double * u, int direction, double r0, int maxpow, double * Rout, double * wout, double * Cout, double * tout) {
+	return r6pSingleLin(X, u, u, direction, r0, maxpow, Rout, wout, Cout, tout);
 }
