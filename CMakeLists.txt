@@ -16,8 +16,17 @@ if (EIGEN_FOUND)
   include_directories(${EIGEN_INCLUDE_DIRS})
 endif (EIGEN_FOUND)
 
-find_package (Python COMPONENTS Interpreter Development)
-
+if(NOT DEFINED Python_EXECUTABLE)
+    find_package (Python COMPONENTS Interpreter Development)
+    if(Python_FOUND)
+        message(WARNING "Python ${Python_VERSION} found and will be used. If you want to use a different version, please specify Python_EXECUTABLE variable")
+    else()
+        message(WARNING "Python was not found automatically. If you want to compile the python bindings, please specify the Python_EXECUTABLE variable")
+    endif(Python_FOUND)
+else()
+    message(WARNING "Python executable specified by user: ${Python_EXECUTABLE}")
+    set(Python_FOUND True)
+endif()
 
 
 include_directories(
@@ -25,7 +34,7 @@ include_directories(
 )
 
 
-add_library(rnp SHARED
+add_library(rnp STATIC
   c++/r6pDoubleLin.cpp c++/r6pSingleLin.cpp c++/sturm.cpp c++/utils.cpp
 )
 
@@ -33,11 +42,13 @@ target_include_directories(rnp PRIVATE .)
 target_include_directories(rnp PUBLIC ${EIGEN_INCLUDE_DIRS})
 
 set_target_properties(rnp PROPERTIES PUBLIC_HEADER c++/rnp.h)
+set_target_properties(rnp PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_link_libraries (rnp Eigen3::Eigen)
 
 install(TARGETS rnp
     LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION arch
     PUBLIC_HEADER DESTINATION include)
 
 
@@ -51,7 +62,7 @@ if(Python_FOUND)
     configure_file(${SETUP_PY_IN} ${SETUP_PY})
 
     add_custom_command(OUTPUT "rnppy" 
-        COMMAND python3 ${CMAKE_SOURCE_DIR}/cython/setup.py build_ext --inplace --include-dirs "${CMAKE_SOURCE_DIR}/c++/" --library-dirs "${CMAKE_CURRENT_BINARY_DIR}"
+        COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/cython/setup.py build_ext --inplace --include-dirs "${CMAKE_SOURCE_DIR}/c++/" --library-dirs "${CMAKE_CURRENT_BINARY_DIR}"
         DEPENDS rnp)
 
     target_link_libraries (rnp)
