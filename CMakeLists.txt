@@ -28,6 +28,10 @@ else()
     set(Python_FOUND True)
 endif()
 
+find_package(Matlab COMPONENTS MX_LIBRARY MEX_COMPILER)
+
+
+
 
 include_directories(
     c++
@@ -50,6 +54,12 @@ install(TARGETS rnp
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION arch
     PUBLIC_HEADER DESTINATION include)
+
+matlab_add_mex(
+    NAME r6pSingleLin
+    SRC "matlab/r6pSingleLinMex.cpp"
+    LINK_TO rnp
+)
 
 
 if(Python_FOUND)
