@@ -55,12 +55,13 @@ install(TARGETS rnp
     ARCHIVE DESTINATION arch
     PUBLIC_HEADER DESTINATION include)
 
-matlab_add_mex(
-    NAME r6pSingleLin
-    SRC "matlab/r6pSingleLinMex.cpp"
-    LINK_TO rnp
-)
-
+if(Matlab_FOUND)
+    matlab_add_mex(
+        NAME r6pSingleLin
+        SRC "matlab/r6pSingleLinMex.cpp"
+        LINK_TO rnp
+    )
+endif(Matlab_FOUND)
 
 if(Python_FOUND)
 
