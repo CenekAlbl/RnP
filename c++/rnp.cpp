@@ -8,7 +8,8 @@ double calcErrAlgebraicRnPFocalRadialDoubleLin(Eigen::Vector3d vr, Eigen::Vector
         Eigen::Matrix3d K = Eigen::Matrix3d::Diag(1,1,f);
         Eigen::Matrix3d I = Eigen::Matrix3d::Identity();
         double rs = (u(0,i)-r0);
-        err += X_(uh)*K*(I+rs*());
+        Eigen::Vector3d eq = X_(uh)*K*((I + rs*X_(wr))*(I + X_(vr))*X.col(i) + Cr + rs*tr));
+        err += eq.abs().sum();
     }
     
 }

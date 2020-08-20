@@ -1,19 +1,39 @@
 #include <iostream>
 #include <chrono>
 #include "RnP.h"
+#include <iomanip>
 
 
 template<typename Model, int (*Solver)(Eigen::Matrix<double,7,3> X, Eigen::Matrix<double,7,2> u, Eigen::Vector3d vk, double r0, std::vector<Model> * results)>
-int iterativeRnP(Eigen::Matrix<double,7,3> X, Eigen::Matrix<double,7,2> u, Eigen::Vector3d vk, int sampleSize, double r0, int maxIter){
+int iterativeRnP(Eigen::Matrix<double,7,3> X, Eigen::Matrix<double,7,2> u, Eigen::Vector3d vk, int sampleSize, double r0, int maxIter, Model & result){
     int notFound = 1;
     int k = 0;
+
+    result.v = Eigen::Vector3d::Zero();
+    result.C = Eigen::Vector3d::Zero();
+    result.w = Eigen::Vector3d::Zero();
+    result.t = Eigen::Vector3d::Zero();
+    result.f = 1;
+    result.rd = 0;
+
+    double errPrev = 1e6;
 
     std::vector<Model> results;
 
     while(notFound && k < maxIter){
-        Solver(X, u, vk, r0, &results); 
+        Solver(X, u, vk, 0,  &results); 
+        // if the inner solver returned no solution
+        if(!results.size()){
+            return 0;
+        }
+
+        double errPrev = 1e6;
+
+        for(auto const& res: results){
+            // std::cout << res.C(0) << "\n";
+        }
+
         k++;       
-        std::cout << results[0].C(0) << "\n";
     }
     return 0;
 }
@@ -32,12 +52,12 @@ A.col(6) = -u.col(1);
 A.col(7) = u.col(0);
 A.col(8) = u.col(1).array() * (r0 - u.col(0).array());
 A.col(9) = -u.col(0).array() * (r0 - u.col(0).array());
-A.col(10) = -X.col(1).cwiseProduct(u.col(0)) - X.col(0).cwiseProduct(u.col(1));
+A.col(10) = X.col(1).cwiseProduct(u.col(0)) - X.col(0).cwiseProduct(u.col(1));
 
 Eigen::MatrixXd nn = A.fullPivLu().kernel();
-// std::cout << nn << "\n";
 
-Eigen::MatrixXd n(11,4);
+Eigen::MatrixXd n(10,4);
+
 
 for ( int i = 0; i < 10; i++)
 {
@@ -59,7 +79,7 @@ Eigen::MatrixXd A1 = Eigen::MatrixXd::Zero(7,6);
 A1.col(0) = -u.col(1).array() * (X.col(1).array() * (n(3,0) * (r0 - u.col(0).array()) - n(0,0) + n(4,0) * vk(2) * (r0 - u.col(0).array())) + X.col(0).array() * (n(1,0) - n(4,0) * (r0 - u.col(0).array()) + n(3,0) * vk(2) * (r0-u.col(0).array())) - X.col(2).array() * (n(3,0) * vk(0) * (r0 - u.col(0).array()) + n(4,0) * vk(1) * (r0 - u.col(0).array())));
 A1.col(1) = -u.col(1).array() * (X.col(1).array() * (n(3,1) * (r0 - u.col(0).array()) - n(0,1) + n(4,1) * vk(2) * (r0 - u.col(0).array())) + X.col(0).array() * (n(1,1) - n(4,1) * (r0 - u.col(0).array()) + n(3,1) * vk(2) * (r0-u.col(0).array())) - X.col(2).array() * (n(3,1) * vk(0) * (r0 - u.col(0).array()) + n(4,1) * vk(1) * (r0 - u.col(0).array())));
 A1.col(2) = -u.col(1).array() * (X.col(1).array() * (n(3,2) * (r0 - u.col(0).array()) - n(0,2) + n(4,2) * vk(2) * (r0 - u.col(0).array())) + X.col(0).array() * (n(1,2) - n(4,2) * (r0 - u.col(0).array()) + n(3,2) * vk(2) * (r0-u.col(0).array())) - X.col(2).array() * (n(3,2) * vk(0) * (r0 - u.col(0).array()) + n(4,2) * vk(1) * (r0 - u.col(0).array())));
-A1.col(5) = -u.col(1).array() * (X.col(1).array() * (n(3,3) * (r0 - u.col(0).array()) - n(0,3) + n(4,3) * vk(2) * (r0 - u.col(0).array())) + X.col(0).array() * (n(1,3) - n(4,3) * (r0 - u.col(0).array()) + n(3,3) * vk(2) * (r0-u.col(0).array())) - X.col(2).array() * (n(3,3) * vk(0) * (r0 - u.col(0).array()) + n(4,3) * vk(1) * (r0 - u.col(0).array())));
+A1.col(5) = -u.col(1).array() * (X.col(1).array() * (n(3,3) * (r0 - u.col(0).array()) - n(0,3) + n(4,3) * vk(2) * (r0 - u.col(0).array())) + X.col(0).array() * (n(1,3) - n(4,3) * (r0 - u.col(0).array()) + n(3,3) * vk(2) * (r0-u.col(0).array())) - X.col(2).array() * (n(3,3) * vk(0) * (r0 - u.col(0).array()) + n(4,3) * vk(1) * (r0 - u.col(0).array())+1));
 A1.col(3) = u.col(1);
 A1.col(4) = -u.col(1).array() * (r0 - u.col(0).array());
 
@@ -68,17 +88,10 @@ Eigen::GeneralizedEigenSolver<Eigen::MatrixXd> ges;
 ges.compute(A0.topRows(6), A1.topRows(6),true);
 Eigen::VectorXcd ff = ges.eigenvalues();
 Eigen::MatrixXcd xx = ges.eigenvectors();
-std::cout << ff << "\n";
-std::cout << xx << "\n";
-std::cout << ff.rows() << " " << ff.cols() << "\n";
-
-
-
 
 for (int i = 0; i < ff.rows(); i++)
 {
-    
-    if(ff(i).real() > 10e-6 & ff(i).imag() < 10e-6){
+    if(std::abs(ff(i).real()) > 10e-6 & std::abs(ff(i).imag()) < 10e-6){
         double f = ff(i).real();
         double a, b, c;
         Eigen::Vector3d C,v,w,t;
@@ -88,7 +101,6 @@ for (int i = 0; i < ff.rows(); i++)
         c = x(2)/x(5);
         C(2) = x(3)/x(5);
         t(2) = x(4)/x(5);
-
         // TODO decrement indices
         v(0) = a*n(0,0)+b*n(0,1)+c*n(0,2)+n(0,3);
         v(1) = a*n(1,0)+b*n(1,1)+c*n(1,2)+n(1,3);
@@ -100,7 +112,7 @@ for (int i = 0; i < ff.rows(); i++)
         C(1) = a*n(7,0)+b*n(7,1)+c*n(7,2)+n(7,3);
         t(0) = a*n(8,0)+b*n(8,1)+c*n(8,2)+n(8,3);
         t(1) = a*n(9,0)+b*n(9,1)+c*n(9,2)+n(9,3);
-
+        std::cout << C << "\n";
         results->push_back({v, C, w, t, f, 0});
     }
 }
@@ -113,16 +125,31 @@ return 0;
 
 int main(int argc, char ** argv){
 
+std::srand((unsigned int) std::time(0));
 
-int res =  iterativeRnP<RSDoublelinCameraPose,lin_w_t_v_C_focal_6>(Eigen::Matrix<double,7,3>::Random(), Eigen::Matrix<double,7,2>::Random(), Eigen::Vector3d::Random(), 7, 0.0, 5);
+Eigen::MatrixXd X(3,7);
+Eigen::MatrixXd u(2,7);
+
+X << 0.537667139546100,   0.862173320368121,  -0.433592022305684,   2.769437029884877,   0.725404224946106,  -0.204966058299775,  1.409034489800479,
+   1.833885014595086,   0.318765239858981,   0.342624466538650,  -1.349886940156521,  -0.063054873189656,  -0.124144348216312, 1.417192413429614,
+  -2.258846861003648,  -1.307688296305273,   3.578396939725760,   3.034923466331855,   0.714742903826096,   1.489697607785465, 0.671497133608080;
+
+u << -1.207486922685038,   1.630235289164729,   1.034693009917860,  -0.303440924786016,  -0.787282803758638,  -1.147070106969150,  -0.809498694424876,
+   0.717238651328838,   0.488893770311789,   0.726885133383238,   0.293871467096658,   0.888395631757642,  -1.068870458168032,  -2.944284161994896;
+
+  
+RSDoublelinCameraPose result;
+
+// int res =  iterativeRnP<RSDoublelinCameraPose,lin_w_t_v_C_focal_6>(Eigen::Matrix<double,7,3>::Random(), Eigen::Matrix<double,7,2>::Random(), Eigen::Vector3d::Random(), 7, 0.0, 5, result);
+
+int res =  iterativeRnP<RSDoublelinCameraPose,lin_w_t_v_C_focal_6>(X.transpose(),u.transpose(), Eigen::Vector3d::Zero(), 7, 0.0, 5, result);
 
 
 // std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 // for (size_t i = 0; i < 10000; i++)
 // {
-    // RSDoublelinCameraPoseVector results;
-    // lin_w_t_v_C_focal_6(Eigen::Matrix<double,7,3>::Random(), Eigen::Matrix<double,7,2>::Random(), Eigen::Vector3d::Random(), 0 , &results);
-    // std::cout << results[0].C;
+//     RSDoublelinCameraPose result;
+//     int res =  iterativeRnP<RSDoublelinCameraPose,lin_w_t_v_C_focal_6>(Eigen::Matrix<double,7,3>::Random(), Eigen::Matrix<double,7,2>::Random(), Eigen::Vector3d::Random(), 7, 0.0, 1, result);
 // }
 
 // std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
