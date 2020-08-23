@@ -1,7 +1,7 @@
 # RnP
 Algorithms for computing the rolling shutter absolute camera pose. They are available in various languages (C++,Python,Matlab), but sometimes not in all of them, see below.
 
-![Rolling shutter absolute pose][absolute_pose_rs.png]
+![Rolling shutter absolute pose](absolute_pose_rs.png)
 
 *This repository is in the process of being completed, some parts still missing*
 
