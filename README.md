@@ -12,6 +12,10 @@ This is the 7 point version for cameras with unknown intrinsics. There are 2 alg
 
 These algorithms are currently only available as research code in Matlab. C++ and Python implementation plus documentation and tests are underway. If you are interested in efficient implementation right now, please contact me and I can make it bigger priority.
 
+The algorithms were presented in:  
+
+Z. Kukelova, C. Albl, A. Sugimoto, K. Schindler, T. Pajdla, "Minimal Rolling Shutter Absolute Pose with Unknown Focal Length and Radial", *European Conference on Computer Vision (ECCV)* 2020
+
 ## R6P-1lin
 This is the single-linearized standalone RS absolute pose solver presented in:
 
