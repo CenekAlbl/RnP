@@ -21,16 +21,19 @@ int iterativeRnP(Eigen::Matrix<double,7,3> X, Eigen::Matrix<double,7,2> u, Eigen
     std::vector<Model> results;
 
     while(notFound && k < maxIter){
-        Solver(X, u, vk, 0,  &results); 
+        Solver(X, u, result.v, 0,  &results); 
         // if the inner solver returned no solution
         if(!results.size()){
             return 0;
         }
 
-        double errPrev = 1e6;
-
         for(auto const& res: results){
-            // std::cout << res.C(0) << "\n";
+            double errNew = calcErrAlgebraicRnPFocalRadialDoubleLin(res.v, res.C, res.w, res.t, res.f, res.rd,  r0,  X.transpose(),  u.transpose());
+            if(errNew < errPrev){
+                result = res;
+                errPrev = errNew;
+                std::cout << "errNew: " << errNew << "\n";
+            }
         }
 
         k++;       
@@ -92,7 +95,7 @@ Eigen::MatrixXcd xx = ges.eigenvectors();
 for (int i = 0; i < ff.rows(); i++)
 {
     if(std::abs(ff(i).real()) > 10e-6 & std::abs(ff(i).imag()) < 10e-6){
-        double f = ff(i).real();
+        double f = 1/ff(i).real();
         double a, b, c;
         Eigen::Vector3d C,v,w,t;
         Eigen::VectorXd x = xx.col(i).real();
@@ -112,7 +115,7 @@ for (int i = 0; i < ff.rows(); i++)
         C(1) = a*n(7,0)+b*n(7,1)+c*n(7,2)+n(7,3);
         t(0) = a*n(8,0)+b*n(8,1)+c*n(8,2)+n(8,3);
         t(1) = a*n(9,0)+b*n(9,1)+c*n(9,2)+n(9,3);
-        std::cout << C << "\n";
+        std::cout << "C: " << C << "\n";
         results->push_back({v, C, w, t, f, 0});
     }
 }
@@ -137,7 +140,15 @@ X << 0.537667139546100,   0.862173320368121,  -0.433592022305684,   2.7694370298
 u << -1.207486922685038,   1.630235289164729,   1.034693009917860,  -0.303440924786016,  -0.787282803758638,  -1.147070106969150,  -0.809498694424876,
    0.717238651328838,   0.488893770311789,   0.726885133383238,   0.293871467096658,   0.888395631757642,  -1.068870458168032,  -2.944284161994896;
 
+// synthetic data generated with RS model
+
+X << -0.503909660144734,  -0.298950855822539,   0.169495966151121,  -0.425456298098001,  -0.489857699307035,  -0.123874335620373,  -0.446421966521499,
+   0.200846972671030,   0.593347927125033,  -0.482886654281585,   0.885086516289968,   0.806102240976620,   0.027467242888846,   0.501076519424143,
+  -2.065389955548187,   0.054205758855624,  -0.425973877083998,   0.186843179728400,  -0.359508816247434,  -0.566837662670934,  -0.957820172224483;
   
+u << -0.270836283773268,  -0.517671729904335,  -0.575222810376785,  -0.501436620776611,  -0.409834538142448,  -0.475797263728415,  -0.358882073270815,
+  -0.050773801610145,  -0.222719459414455,   0.075702713083869,  -0.312858144184682,  -0.242367363513907,  -0.044286902417554,  -0.138074970066516;
+
 RSDoublelinCameraPose result;
 
 // int res =  iterativeRnP<RSDoublelinCameraPose,lin_w_t_v_C_focal_6>(Eigen::Matrix<double,7,3>::Random(), Eigen::Matrix<double,7,2>::Random(), Eigen::Vector3d::Random(), 7, 0.0, 5, result);

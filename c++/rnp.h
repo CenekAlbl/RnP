@@ -2,6 +2,7 @@
 
 #include <Eigen/Eigen>
 #include <vector>
+#include "utils.h"
 
 struct RSCameraPose{
     Eigen::Matrix3d R; // Camera orientation as rotation matrix

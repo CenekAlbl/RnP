@@ -1,7 +1,16 @@
 # RnP
 Algorithms for computing the rolling shutter absolute camera pose. They are available in various languages (C++,Python,Matlab), but sometimes not in all of them, see below.
 
+![Rolling shutter absolute pose][absolute_pose_rs.png]
+
 *This repository is in the process of being completed, some parts still missing*
+
+## R7P
+This is the 7 point version for cameras with unknown intrinsics. There are 2 algorithms:
+* R7Pf - computes the camera pose + velocity + the focal length
+* R7Pfr - computes the camera pose + velocity + the focal length and radial distortion  
+
+These algorithms are currently only available as research code in Matlab. C++ and Python implementation plus documentation and tests are underway. If you are interested in efficient implementation right now, please contact me and I can make it bigger priority.
 
 ## R6P-1lin
 This is the single-linearized standalone RS absolute pose solver presented in:
