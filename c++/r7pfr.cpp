@@ -4,17 +4,128 @@
 #include <chrono>
 #include "RnP.h"
 
-int solver_R7Pfr(Eigen::MatrixXd data){
 
-Eigen::MatrixXd C0 = Eigen::MatrixXd::Random(26,26);
-Eigen::MatrixXd C1 = Eigen::MatrixXd::Random(26,10);
+static void compute_coeffs(const double data[35], double coeffs[34])
+{
+  coeffs[0] = -data[15];
+  coeffs[1] = -data[16];
+  coeffs[2] = -data[14];
+  coeffs[3] = data[1] - data[17];
+  coeffs[4] = -data[18];
+  coeffs[5] = data[2];
+  coeffs[6] = -data[19];
+  coeffs[7] = data[0];
+  coeffs[8] = data[3];
+  coeffs[9] = data[4] - data[20];
+  coeffs[10] = data[5];
+  coeffs[11] = data[6];
+  coeffs[12] = data[8];
+  coeffs[13] = data[9] - data[17];
+  coeffs[14] = data[7];
+  coeffs[15] = data[10];
+  coeffs[16] = data[11];
+  coeffs[17] = data[12] - data[20];
+  coeffs[18] = data[13];
+  coeffs[19] = 1.0;
+  coeffs[20] = data[22];
+  coeffs[21] = data[23];
+  coeffs[22] = data[21];
+  coeffs[23] = data[24];
+  coeffs[24] = data[25];
+  coeffs[25] = data[26];
+  coeffs[26] = data[27];
+  coeffs[27] = data[29];
+  coeffs[28] = data[30];
+  coeffs[29] = data[28];
+  coeffs[30] = data[31];
+  coeffs[31] = data[32];
+  coeffs[32] = data[33];
+  coeffs[33] = data[34];
+}
 
-C0.lu().solve(C1);
+static void setup_elimination_template(Eigen::Matrix<double,35,1> const input, Eigen::Matrix<double,26,26> &C0, Eigen::Matrix<double,26,10> &C1)
+{
+  double coeffs[34];
+  int i0;
+  static const short iv0[151] = { 0, 5, 27, 35, 54, 57, 60, 78, 79, 80, 81, 83,
+    85, 87, 102, 105, 108, 113, 116, 130, 133, 153, 157, 162, 163, 179, 184, 187,
+    195, 208, 211, 233, 234, 235, 236, 237, 240, 241, 247, 256, 257, 259, 260,
+    262, 263, 264, 265, 270, 272, 280, 286, 289, 297, 313, 318, 319, 322, 323,
+    324, 326, 335, 340, 341, 351, 363, 364, 366, 367, 374, 375, 376, 377, 378,
+    380, 389, 394, 400, 401, 402, 404, 405, 408, 410, 426, 427, 428, 430, 452,
+    453, 454, 456, 458, 459, 460, 482, 484, 485, 486, 496, 497, 499, 502, 503,
+    507, 513, 515, 518, 519, 522, 525, 535, 554, 555, 565, 570, 573, 578, 579,
+    580, 581, 591, 595, 596, 602, 606, 607, 613, 616, 617, 618, 622, 625, 628,
+    630, 631, 632, 633, 634, 635, 636, 638, 639, 642, 643, 644, 647, 648, 654,
+    665, 668, 670 };
 
-Eigen::MatrixXd AM = Eigen::MatrixXd::Random(10,10);
+  static const signed char iv1[151] = { 0, 0, 0, 0, 0, 12, 19, 3, 2, 1, 0, 13,
+    19, 2, 19, 4, 0, 4, 0, 5, 1, 19, 5, 1, 21, 28, 2, 14, 19, 7, 2, 19, 8, 7, 5,
+    13, 2, 22, 21, 19, 29, 28, 9, 6, 4, 2, 17, 19, 2, 19, 10, 6, 19, 10, 6, 25,
+    21, 28, 5, 1, 32, 7, 14, 22, 29, 11, 10, 17, 22, 29, 7, 25, 2, 19, 32, 17,
+    24, 31, 9, 4, 25, 6, 32, 25, 32, 10, 6, 26, 33, 11, 17, 32, 25, 10, 18, 33,
+    26, 11, 3, 12, 15, 22, 14, 20, 2, 19, 29, 27, 4, 16, 19, 20, 12, 0, 27, 3, 0,
+    20, 21, 13, 1, 27, 28, 12, 24, 16, 20, 0, 4, 27, 31, 9, 13, 4, 24, 25, 17,
+    20, 27, 3, 0, 21, 1, 6, 28, 31, 32, 16, 24, 4, 31 };
+
+  static const unsigned char uv0[87] = { 2U, 3U, 6U, 13U, 19U, 21U, 22U, 25U,
+    28U, 29U, 30U, 31U, 39U, 41U, 43U, 44U, 46U, 51U, 54U, 55U, 65U, 66U, 68U,
+    69U, 70U, 77U, 84U, 86U, 87U, 97U, 99U, 100U, 102U, 105U, 110U, 111U, 123U,
+    125U, 126U, 127U, 136U, 149U, 151U, 152U, 160U, 162U, 164U, 165U, 170U, 171U,
+    172U, 173U, 174U, 175U, 176U, 177U, 178U, 180U, 183U, 188U, 189U, 192U, 193U,
+    194U, 196U, 198U, 199U, 200U, 201U, 203U, 204U, 205U, 214U, 222U, 224U, 225U,
+    226U, 227U, 229U, 230U, 238U, 248U, 249U, 250U, 251U, 252U, 254U };
+
+  static const signed char iv2[87] = { 8, 15, 14, 23, 7, 22, 29, 30, 9, 16, 14,
+    18, 24, 22, 19, 2, 29, 31, 11, 18, 26, 14, 29, 22, 7, 33, 12, 23, 15, 3, 20,
+    27, 30, 8, 13, 23, 5, 21, 28, 30, 15, 8, 23, 30, 15, 16, 26, 18, 12, 23, 27,
+    20, 3, 9, 30, 24, 31, 33, 11, 17, 26, 23, 30, 8, 13, 28, 21, 5, 10, 25, 32,
+    33, 18, 15, 30, 23, 8, 11, 26, 33, 18, 16, 26, 31, 24, 9, 33 };
+
+  compute_coeffs(input.data(), coeffs);
+  memset(&C0.data()[0], 0, 676U * sizeof(double));
+  memset(&C1.data()[0], 0, 260U * sizeof(double));
+  for (i0 = 0; i0 < 151; i0++) {
+    C0.data()[iv0[i0]] = coeffs[iv1[i0]];
+  }
+
+  for (i0 = 0; i0 < 87; i0++) {
+    C1.data()[uv0[i0]] = coeffs[iv2[i0]];
+  }
+}
+
+int solver_R7Pfr(Eigen::Matrix<double,35,1> const data){
+
+Eigen::Matrix<double, 26, 26> C0;
+Eigen::Matrix<double, 26, 10> C1;
+
+std::cout << "setting up elimination template \n";
+
+setup_elimination_template(data, C0, C1);
+
+std::cout << "elimination template set\n";
+
+
+C1 = C0.lu().solve(C1);
+
+std::cout << C1 << "\n";
+
+Eigen::Matrix<double, 17, 10> RR;
+
+RR.topRows(7) = -C1.bottomRows(7);
+RR.bottomRows(10) = Eigen::MatrixXd::Identity(10,10);
+
+std::vector<int> ind{1,2,9,3,4,11,5,6,14,7};
+
+Eigen::Matrix<double, 10, 10> AM;
+
+
+
+
+// AM = RR(ind,Eigen::all)
 
 Eigen::EigenSolver<Eigen::MatrixXd> eig(AM);
-eig.eigenvalues();
+std::cout << eig.eigenvalues() << "\n";
 eig.eigenvectors();
 
 return 0;
@@ -101,7 +212,10 @@ AA.col(13) = X.col(0).array()*(n(5,3)*(r0 - u.col(0).array()) - n(2,3) + n(3,3)*
 
 Eigen::MatrixXd AR = AA.leftCols(7).lu().solve(AA);
 
-Eigen::VectorXd data << AA.col(0).tail(7), AA.col(1).tail(7), AA.col(2).tail(7), AA.col(3).tail(7), AA.col(4).tail(7);
+
+Eigen::Matrix<double,35,1> data; 
+data << AR.row(0).tail(7).transpose(), AR.row(1).tail(7).transpose(), AR.row(2).tail(7).transpose(), AR.row(3).tail(7).transpose(), AR.row(4).tail(7).transpose();
+
 
 solver_R7Pfr(data);
 
@@ -110,43 +224,7 @@ return 0;
 }
 
 
-static void compute_coeffs(const double data[35], double coeffs[34])
-{
-  coeffs[0] = -data[15];
-  coeffs[1] = -data[16];
-  coeffs[2] = -data[14];
-  coeffs[3] = data[1] - data[17];
-  coeffs[4] = -data[18];
-  coeffs[5] = data[2];
-  coeffs[6] = -data[19];
-  coeffs[7] = data[0];
-  coeffs[8] = data[3];
-  coeffs[9] = data[4] - data[20];
-  coeffs[10] = data[5];
-  coeffs[11] = data[6];
-  coeffs[12] = data[8];
-  coeffs[13] = data[9] - data[17];
-  coeffs[14] = data[7];
-  coeffs[15] = data[10];
-  coeffs[16] = data[11];
-  coeffs[17] = data[12] - data[20];
-  coeffs[18] = data[13];
-  coeffs[19] = 1.0;
-  coeffs[20] = data[22];
-  coeffs[21] = data[23];
-  coeffs[22] = data[21];
-  coeffs[23] = data[24];
-  coeffs[24] = data[25];
-  coeffs[25] = data[26];
-  coeffs[26] = data[27];
-  coeffs[27] = data[29];
-  coeffs[28] = data[30];
-  coeffs[29] = data[28];
-  coeffs[30] = data[31];
-  coeffs[31] = data[32];
-  coeffs[32] = data[33];
-  coeffs[33] = data[34];
-}
+
 
 int main(int argc, char ** argv){
 
