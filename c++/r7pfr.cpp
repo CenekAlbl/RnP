@@ -2,7 +2,9 @@
 #include <Eigen/Eigenvalues>
 #include <iostream>
 #include <chrono>
-#include "RnP.h"
+#include "rnp.h"
+
+
 
 
 static void compute_coeffs(const double data[35], double coeffs[34])
@@ -94,7 +96,7 @@ static void setup_elimination_template(Eigen::Matrix<double,35,1> const input, E
   }
 }
 
-int solver_R7Pfr(Eigen::Matrix<double,35,1> const data){
+int solver_R7Pfr(Eigen::Matrix<double,35,1> const data, Eigen::Matrix<std::complex<double>,4,10> & sols){
 
 Eigen::Matrix<double, 26, 26> C0;
 Eigen::Matrix<double, 26, 10> C1;
@@ -108,31 +110,43 @@ std::cout << "elimination template set\n";
 
 C1 = C0.lu().solve(C1);
 
-std::cout << C1 << "\n";
+
 
 Eigen::Matrix<double, 17, 10> RR;
 
 RR.topRows(7) = -C1.bottomRows(7);
 RR.bottomRows(10) = Eigen::MatrixXd::Identity(10,10);
 
-std::vector<int> ind{1,2,9,3,4,11,5,6,14,7};
+int ind[10] = {0,1,8,2,3,10,4,5,13,6};
 
 Eigen::Matrix<double, 10, 10> AM;
 
 
 
-
-// AM = RR(ind,Eigen::all)
+for (int i = 0; i < 10; i++)
+{
+    AM.row(i) = RR.row(ind[i]);
+}
 
 Eigen::EigenSolver<Eigen::MatrixXd> eig(AM);
-std::cout << eig.eigenvalues() << "\n";
-eig.eigenvectors();
+Eigen::Matrix<std::complex<double>,10,1> D = eig.eigenvalues();
+Eigen::Matrix<std::complex<double>,10,10> V = eig.eigenvectors();
 
+
+Eigen::Matrix<std::complex<double>,10,1> scale = D.array()/V.row(9).array().transpose();
+
+V = V.array() * (Eigen::Matrix<double,10,1>::Ones() * scale.transpose()).array();
+
+
+sols.row(0) << V.row(2);
+sols.row(1) << V.row(8);
+sols.row(2) << D.transpose();
+sols.row(3) << V.row(4).array() / sols.row(1).array().pow(2);
 return 0;
 }
 
 
-int lin_w_t_v_C_focal_radial(Eigen::Matrix<double,7,3> X, Eigen::Matrix<double,7,2> u, Eigen::Vector3d vk, double r0, RSDoublelinCameraPoseVector * results){
+int R7PfrLin(Eigen::Matrix<double,7,3> X, Eigen::Matrix<double,7,2> u, Eigen::Vector3d vk, double r0, RSDoublelinCameraPoseVector * results){
 
 
 Eigen::MatrixXd A = Eigen::MatrixXd::Zero(7,11);
@@ -177,19 +191,6 @@ for ( int i = 0; i < 10; i++)
     n(i,3) = nn(i,3)/nn(10,3);
 }
 
-
-n << -0.494882181407799,   0.411226263985881,   0.318345335859557,   0.927819398937113,
-   0.993052896562505,   0.687977958425696,   0.768893995395170,  -1.793033698569230,
-  -0.518424090047564,  -0.923289492859002,   0.472050129410013,   1.129772420556994,
-  -0.000818047233864,  -0.000355381576460,   0.000238057785641,   0.000167456002760,
-  -0.001271430972275,  -0.001007920402057,  -0.000066867094954,   0.001183167323652,
-   0.000238330557519,   0.001527458270602,  -0.000768958234596,  -0.001320982654342,
-   0.551245446952516,   0.337315602380641,   0.619130851038882,  -1.908967112082546,
-   0.550113067243128,  -0.402009451439514,  -0.178094285891012,   0.809029947913194,
-  -0.000061795565197,  -0.000822741118985,  -0.001197822291309,   0.000595842167120,
-  -0.002044071545096,   0.000806256182446,   0.000662084265002,   0.000148745747078;
-
-
 Eigen::VectorXd r2 = u.col(0).array().pow(2)+u.col(1).array().pow(2);
 
 
@@ -217,7 +218,45 @@ Eigen::Matrix<double,35,1> data;
 data << AR.row(0).tail(7).transpose(), AR.row(1).tail(7).transpose(), AR.row(2).tail(7).transpose(), AR.row(3).tail(7).transpose(), AR.row(4).tail(7).transpose();
 
 
-solver_R7Pfr(data);
+Eigen::Matrix<std::complex<double>, 4, 10> sols;
+
+
+solver_R7Pfr(data, sols);
+
+// std::cout << sols;
+
+for (int i = 0; i < 10; i++)
+{
+    if(!std::isnan(sols(2,i).real()) & std::abs(sols(2,i).real()) > 1e-6 & std::abs(sols(2,i).imag()) < 1e-10){
+        RSDoublelinCameraPose res;
+        double f = sols(2,i).real();
+        double b = sols(0,i).real();
+        double c = sols(1,i).real();
+        double rd = sols(3,i).real();
+
+        Eigen::Matrix<double,7,1> mon; 
+        mon << b, c*f, c*rd, c, f, rd, 1;
+        double a = -AR.row(2).tail(7).dot(mon);
+        res.C(2) = (-AR.row(5).tail(7).dot(mon))/f;
+        res.t(2) = (-AR.row(6).tail(7).dot(mon))/f;
+        res.v(0) = a*n(0,0)+b*n(0,1)+c*n(0,2)+n(0,3);
+        res.v(1) = a*n(1,0)+b*n(1,1)+c*n(1,2)+n(1,3);
+        res.v(2) = a*n(2,0)+b*n(2,1)+c*n(2,2)+n(2,3);
+        res.w(0) = a*n(3,0)+b*n(3,1)+c*n(3,2)+n(3,3);
+        res.w(1) = a*n(4,0)+b*n(4,1)+c*n(4,2)+n(4,3);
+        res.w(2) = a*n(5,0)+b*n(5,1)+c*n(5,2)+n(5,3);
+        res.C(0) = a*n(6,0)+b*n(6,1)+c*n(6,2)+n(6,3);
+        res.C(1) = a*n(7,0)+b*n(7,1)+c*n(7,2)+n(7,3);
+        res.t(0) = a*n(8,0)+b*n(8,1)+c*n(8,2)+n(8,3);
+        res.t(1) = a*n(9,0)+b*n(9,1)+c*n(9,2)+n(9,3);
+        res.f = 1/f;
+        res.rd = rd;
+        
+        results->push_back(res);
+    }
+}
+
+
 
 return 0;
 
@@ -231,20 +270,24 @@ int main(int argc, char ** argv){
 Eigen::MatrixXd X(3,7);
 Eigen::MatrixXd u(2,7);
 
-X << 0.930335618971609,  -0.412757128555297,  -0.300634768231611,  -0.472768038810491,   0.904183433628433,  -0.746899095560691,   0.782781495505683,
-   0.784251388397344,   0.016563901098688,  -0.676295260848509,   0.944897105666936,   0.323358545689461,  -0.370185130712374,   0.202565077125717,
-   0.881573031546951,   0.786836620540149,  -0.092437951112491,  -0.339174391869371,   0.821280370700545,   0.470064724843527,  -0.669632274378342;
+X << -0.154328769982384,  -0.164511791366676,   0.402197511801853,   0.396211040360617,  -0.743971200559655,  -0.934798358938944,   0.338350609068788,
+   0.095741802429689,   0.966104932939712,   0.332677703168851,   0.333055826805174,   0.998160789522721,   0.122399585419320,  -0.619133465640092,
+   0.885473968553869,  -0.397090102575869,   0.078252930085713,  -0.643735091199324,  -0.657757867287136,   0.763733000903620,  -0.262166907872210;
 
-u <<  858.8978263748063,   778.5936238794234,   304.1044457640757,   585.7861538645086,   674.3291756530226,   618.6345560318252,   33.8594439672178,
-  -577.5015321917176,  -20.4871105409913,  -10.7388316467659,  -593.0554378121407,  -267.4839868749193,   43.4202366607074,  -555.0719801311780;
+
+
+u <<  -3.318016069911907,  -2.775343757918252,  -4.572229450339232,  -4.102178498913005,  -1.096283786243827,  -0.695416706570154,  -3.979703603312582,
+   1.871714078143220,  -0.944139908471160,   0.915847660528469,   0.742548010489727,  -0.984928804523416,   1.689333132959879,   3.350985538985216;
 
 RSDoublelinCameraPoseVector results;
 
+RSDoublelinCameraPose result;
+
 std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-for (size_t i = 0; i < 1; i++)
-{
-    lin_w_t_v_C_focal_radial(X.transpose(), u.transpose(), Eigen::Vector3d::Zero(), 0 , &results);
-}
+
+int res =  iterativeRnP<RSDoublelinCameraPose,R7PfrLin>(X.transpose(),u.transpose(), Eigen::Vector3d::Zero(), 7, 0.0, 5, result);
+
+std::cout << "res: \n" << result.C << "\n";
 
 std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
