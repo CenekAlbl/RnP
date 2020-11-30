@@ -148,6 +148,7 @@ return 0;
 
 int R7PfrLin(Eigen::Matrix<double,7,3> X, Eigen::Matrix<double,7,2> u, Eigen::Vector3d vk, double r0, RSDoublelinCameraPoseVector * results){
 
+results.reserve(10);
 
 Eigen::MatrixXd A = Eigen::MatrixXd::Zero(7,11);
 

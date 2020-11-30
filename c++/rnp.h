@@ -46,5 +46,6 @@ int r6pSingleLin(double * X, double * u, int direction, double r0, int maxpow, R
 
 int r6pDoubleLin(double * X, double * u, int direction, double r0, RSDoublelinCameraPoseVector * output);
 
-double calcErrAlgebraicRnPFocalRadialDoubleLin(Eigen::Vector3d vr, Eigen::Vector3d Cr, Eigen::Vector3d wr, Eigen::Vector3d tr, double f, double rd, double r0, Eigen::MatrixXd X, Eigen::MatrixXd u);
+double calcErrAlgebraicRnPFocalRadialDoubleLin(Eigen::Vector3d vr, Eigen::Vector3d Cr, Eigen::Vector3d wr, Eigen::Vector3d tr, double f, double rd, double r0, Eigen::MatrixXd X, Eigen::MatrixXd u, int direction);
+double calcErrAlgebraicRnPFocalRadialSingleLin(Eigen::Vector3d vr, Eigen::Vector3d Cr, Eigen::Vector3d wr, Eigen::Vector3d tr, double f, double rd, double r0, Eigen::MatrixXd X, Eigen::MatrixXd u, int direction);
 
