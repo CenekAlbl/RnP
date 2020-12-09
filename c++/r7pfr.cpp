@@ -101,11 +101,8 @@ int solver_R7Pfr(Eigen::Matrix<double,35,1> const data, Eigen::Matrix<std::compl
 Eigen::Matrix<double, 26, 26> C0;
 Eigen::Matrix<double, 26, 10> C1;
 
-std::cout << "setting up elimination template \n";
-
 setup_elimination_template(data, C0, C1);
 
-std::cout << "elimination template set\n";
 
 
 C1 = C0.lu().solve(C1);
@@ -148,23 +145,11 @@ return 0;
 
 int R7PfrLin(Eigen::Matrix<double,7,3> X, Eigen::Matrix<double,7,2> u, Eigen::Vector3d vk, double r0, RSDoublelinCameraPoseVector * results){
 
-results.reserve(10);
+
+results->reserve(10);
 
 Eigen::MatrixXd A = Eigen::MatrixXd::Zero(7,11);
 
-
-// A = [ 
-//     -X.col(2).array().*u(:,1), 
-//     -X(:,3).*u(:,2), 
-//     X(:,1).*u(:,1) + X(:,2).*u(:,2), 
-//     u(:,1).*(X(:,3).*(r0 - u(:,1)) - X(:,1).*vk(2).*(r0 - u(:,1)) + X(:,2).*vk(0).*(r0 - u(:,1))), 
-//     u(:,2).*(X(:,3).*(r0 - u(:,1)) - X(:,1).*vk(2).*(r0 - u(:,1)) + X(:,2).*vk(1).*(r0 - u(:,1))), 
-//     - u(:,1).*(X(:,1).*(r0 - u(:,1)) - X(:,2).*vk(3).*(r0 - u(:,1)) + X(:,3).*vk(2).*(r0 - u(:,1))) - u(:,2).*(X(:,2).*(r0 - u(:,1)) + X(:,1).*vk(3).*(r0 - u(:,1)) - X(:,3).*vk(1).*(r0 - u(:,1))), 
-//     -u(:,2), 
-//     u(:,1), 
-//     u(:,2).*(r0 - u(:,1)), 
-//     -u(:,1).*(r0 - u(:,1)), 
-//     X(:,2).*u(:,1) - X(:,1).*u(:,2)];
 
 A.col(0) = -X.col(2).array() * u.col(0).array();
 A.col(1) = -X.col(2).array() * u.col(1).array();
@@ -224,8 +209,6 @@ Eigen::Matrix<std::complex<double>, 4, 10> sols;
 
 solver_R7Pfr(data, sols);
 
-// std::cout << sols;
-
 for (int i = 0; i < 10; i++)
 {
     if(!std::isnan(sols(2,i).real()) & std::abs(sols(2,i).real()) > 1e-6 & std::abs(sols(2,i).imag()) < 1e-10){
@@ -263,36 +246,3 @@ return 0;
 
 }
 
-
-
-
-int main(int argc, char ** argv){
-
-Eigen::MatrixXd X(3,7);
-Eigen::MatrixXd u(2,7);
-
-X << -0.154328769982384,  -0.164511791366676,   0.402197511801853,   0.396211040360617,  -0.743971200559655,  -0.934798358938944,   0.338350609068788,
-   0.095741802429689,   0.966104932939712,   0.332677703168851,   0.333055826805174,   0.998160789522721,   0.122399585419320,  -0.619133465640092,
-   0.885473968553869,  -0.397090102575869,   0.078252930085713,  -0.643735091199324,  -0.657757867287136,   0.763733000903620,  -0.262166907872210;
-
-
-
-u <<  -3.318016069911907,  -2.775343757918252,  -4.572229450339232,  -4.102178498913005,  -1.096283786243827,  -0.695416706570154,  -3.979703603312582,
-   1.871714078143220,  -0.944139908471160,   0.915847660528469,   0.742548010489727,  -0.984928804523416,   1.689333132959879,   3.350985538985216;
-
-RSDoublelinCameraPoseVector results;
-
-RSDoublelinCameraPose result;
-
-std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-
-int res =  iterativeRnP<RSDoublelinCameraPose,R7PfrLin>(X.transpose(),u.transpose(), Eigen::Vector3d::Zero(), 7, 0.0, 5, result);
-
-std::cout << "res: \n" << result.C << "\n";
-
-std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-
-std::cout << "Time difference = " << (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()/10000) << "[µs]" << std::endl;
-    
-
-}

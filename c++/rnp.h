@@ -4,6 +4,9 @@
 #include <vector>
 #include "utils.h"
 
+#define ERR_NO_SOLUTION 1
+#define WARN_NO_CONVERGENCE 2
+
 struct RSCameraPose{
     Eigen::Matrix3d R; // Camera orientation as rotation matrix
     Eigen::Vector3d C; // Camera center

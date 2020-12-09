@@ -4,7 +4,7 @@
 
 
 
-bool rsDoubleLinProjection(const Eigen::Vector3d &X, Eigen::Vector2d &u, const Eigen::Vector3d &v, const Eigen::Vector3d &C, const Eigen::Vector3d &w, const Eigen::Vector3d &t, double f, double rd, double r0, int direction){
+int rsDoubleLinProjection(const Eigen::Vector3d &X, Eigen::Vector2d &u, const Eigen::Vector3d &v, const Eigen::Vector3d &C, const Eigen::Vector3d &w, const Eigen::Vector3d &t, double f, double rd, double r0, int direction){
     // First initiate u with a global shutter projection
     Eigen::Matrix<double,3,4> P;
     Eigen::Vector3d uh;
@@ -29,16 +29,16 @@ bool rsDoubleLinProjection(const Eigen::Vector3d &X, Eigen::Vector2d &u, const E
         diff = (u - temp.head(2)).norm();
         u = temp.head(2);
         if(niter > 100){
-            return false;
+            return WARN_NO_CONVERGENCE;
         }
         niter++;
     }
 
-    return true;
+    return 0;
     
 }
 
-bool rsSingleLinProjection(const Eigen::Vector3d &X, Eigen::Vector2d &u, const Eigen::Vector3d &v, const Eigen::Vector3d &C, const Eigen::Vector3d &w, const Eigen::Vector3d &t, double f, double rd, double r0, int direction){
+int rsSingleLinProjection(const Eigen::Vector3d &X, Eigen::Vector2d &u, const Eigen::Vector3d &v, const Eigen::Vector3d &C, const Eigen::Vector3d &w, const Eigen::Vector3d &t, double f, double rd, double r0, int direction){
     Eigen::Matrix<double,3,4> P;
     Eigen::Vector3d uh;
     Eigen::Matrix3d K = Eigen::Matrix3d::Zero();
@@ -64,13 +64,13 @@ bool rsSingleLinProjection(const Eigen::Vector3d &X, Eigen::Vector2d &u, const E
         diff = (u - temp.head(2)).norm();
         u = temp.head(2);
         if(niter > 100){
-            return false;
+            return WARN_NO_CONVERGENCE;
         }
         niter++;
     }
 
 
-    return true;
+    return 0;
 
 }
 

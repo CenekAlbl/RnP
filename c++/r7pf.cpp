@@ -1,6 +1,6 @@
 #include <iostream>
 #include <chrono>
-#include "RnP.h"
+#include "rnp.h"
 #include <iomanip>
 
 
@@ -94,46 +94,46 @@ return 0;
 
 }
 
-int main(int argc, char ** argv){
+// int main(int argc, char ** argv){
 
-std::srand((unsigned int) std::time(0));
+// std::srand((unsigned int) std::time(0));
 
-Eigen::MatrixXd X(3,7);
-Eigen::MatrixXd u(2,7);
+// Eigen::MatrixXd X(3,7);
+// Eigen::MatrixXd u(2,7);
 
-X << 0.537667139546100,   0.862173320368121,  -0.433592022305684,   2.769437029884877,   0.725404224946106,  -0.204966058299775,  1.409034489800479,
-   1.833885014595086,   0.318765239858981,   0.342624466538650,  -1.349886940156521,  -0.063054873189656,  -0.124144348216312, 1.417192413429614,
-  -2.258846861003648,  -1.307688296305273,   3.578396939725760,   3.034923466331855,   0.714742903826096,   1.489697607785465, 0.671497133608080;
+// X << 0.537667139546100,   0.862173320368121,  -0.433592022305684,   2.769437029884877,   0.725404224946106,  -0.204966058299775,  1.409034489800479,
+//    1.833885014595086,   0.318765239858981,   0.342624466538650,  -1.349886940156521,  -0.063054873189656,  -0.124144348216312, 1.417192413429614,
+//   -2.258846861003648,  -1.307688296305273,   3.578396939725760,   3.034923466331855,   0.714742903826096,   1.489697607785465, 0.671497133608080;
 
-u << -1.207486922685038,   1.630235289164729,   1.034693009917860,  -0.303440924786016,  -0.787282803758638,  -1.147070106969150,  -0.809498694424876,
-   0.717238651328838,   0.488893770311789,   0.726885133383238,   0.293871467096658,   0.888395631757642,  -1.068870458168032,  -2.944284161994896;
+// u << -1.207486922685038,   1.630235289164729,   1.034693009917860,  -0.303440924786016,  -0.787282803758638,  -1.147070106969150,  -0.809498694424876,
+//    0.717238651328838,   0.488893770311789,   0.726885133383238,   0.293871467096658,   0.888395631757642,  -1.068870458168032,  -2.944284161994896;
 
-// synthetic data generated with RS model
+// // synthetic data generated with RS model
 
-X << -0.503909660144734,  -0.298950855822539,   0.169495966151121,  -0.425456298098001,  -0.489857699307035,  -0.123874335620373,  -0.446421966521499,
-   0.200846972671030,   0.593347927125033,  -0.482886654281585,   0.885086516289968,   0.806102240976620,   0.027467242888846,   0.501076519424143,
-  -2.065389955548187,   0.054205758855624,  -0.425973877083998,   0.186843179728400,  -0.359508816247434,  -0.566837662670934,  -0.957820172224483;
+// X << -0.503909660144734,  -0.298950855822539,   0.169495966151121,  -0.425456298098001,  -0.489857699307035,  -0.123874335620373,  -0.446421966521499,
+//    0.200846972671030,   0.593347927125033,  -0.482886654281585,   0.885086516289968,   0.806102240976620,   0.027467242888846,   0.501076519424143,
+//   -2.065389955548187,   0.054205758855624,  -0.425973877083998,   0.186843179728400,  -0.359508816247434,  -0.566837662670934,  -0.957820172224483;
   
-u << -0.270836283773268,  -0.517671729904335,  -0.575222810376785,  -0.501436620776611,  -0.409834538142448,  -0.475797263728415,  -0.358882073270815,
-  -0.050773801610145,  -0.222719459414455,   0.075702713083869,  -0.312858144184682,  -0.242367363513907,  -0.044286902417554,  -0.138074970066516;
+// u << -0.270836283773268,  -0.517671729904335,  -0.575222810376785,  -0.501436620776611,  -0.409834538142448,  -0.475797263728415,  -0.358882073270815,
+//   -0.050773801610145,  -0.222719459414455,   0.075702713083869,  -0.312858144184682,  -0.242367363513907,  -0.044286902417554,  -0.138074970066516;
 
-RSDoublelinCameraPose result;
+// RSDoublelinCameraPose result;
 
-// int res =  iterativeRnP<RSDoublelinCameraPose,lin_w_t_v_C_focal_6>(Eigen::Matrix<double,7,3>::Random(), Eigen::Matrix<double,7,2>::Random(), Eigen::Vector3d::Random(), 7, 0.0, 5, result);
+// // int res =  iterativeRnP<RSDoublelinCameraPose,lin_w_t_v_C_focal_6>(Eigen::Matrix<double,7,3>::Random(), Eigen::Matrix<double,7,2>::Random(), Eigen::Vector3d::Random(), 7, 0.0, 5, result);
 
-int res =  iterativeRnP<RSDoublelinCameraPose,R7PfLin>(X.transpose(),u.transpose(), Eigen::Vector3d::Zero(), 7, 0.0, 5, result);
+// int res =  iterativeRnP<RSDoublelinCameraPose,R7PfLin>(X.transpose(),u.transpose(), Eigen::Vector3d::Zero(), 7, 0.0, 5, result);
 
 
-// std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-// for (size_t i = 0; i < 10000; i++)
-// {
-//     RSDoublelinCameraPose result;
-//     int res =  iterativeRnP<RSDoublelinCameraPose,lin_w_t_v_C_focal_6>(Eigen::Matrix<double,7,3>::Random(), Eigen::Matrix<double,7,2>::Random(), Eigen::Vector3d::Random(), 7, 0.0, 1, result);
-// }
+// // std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+// // for (size_t i = 0; i < 10000; i++)
+// // {
+// //     RSDoublelinCameraPose result;
+// //     int res =  iterativeRnP<RSDoublelinCameraPose,lin_w_t_v_C_focal_6>(Eigen::Matrix<double,7,3>::Random(), Eigen::Matrix<double,7,2>::Random(), Eigen::Vector3d::Random(), 7, 0.0, 1, result);
+// // }
 
-// std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+// // std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
-// std::cout << "Time difference = " << (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()/10000) << "[µs]" << std::endl;
+// // std::cout << "Time difference = " << (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()/10000) << "[µs]" << std::endl;
     
 
-}
+// }
