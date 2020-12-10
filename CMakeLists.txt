@@ -39,7 +39,7 @@ include_directories(
 
 
 add_library(rnp STATIC
-  c++/r6pDoubleLin.cpp c++/r6pSingleLin.cpp c++/R7Pf.cpp c++/R7Pfr.cpp c++/iterative.cpp c++/rnp.cpp c++/sturm.cpp c++/utils.cpp 
+  c++/r6pDoubleLin.cpp c++/r6pSingleLin.cpp c++/r7pf.cpp c++/r7pfr.cpp c++/iterative.cpp c++/rnp.cpp c++/sturm.cpp c++/utils.cpp 
 )
 
 target_include_directories(rnp PRIVATE .)
