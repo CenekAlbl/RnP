@@ -2,6 +2,7 @@
 #include "utils.h"
 #include "danilevsky.h"
 #include "sturm.h"
+#include "rnp.h"
 
 std::vector<Eigen::Vector3d> solve_xy_from_AM(double * z, int nroots, Eigen::MatrixXd AM) {
 	int ind[] = { 5, 6, 7, 9, 10, 12, 15, 16, 18, 22, 26, 27, 29, 33, 38, 43, 44, 47, 51, 56, 63 };
@@ -69,7 +70,7 @@ std::vector<Eigen::Vector3d> solve_xy_from_AM(double * z, int nroots, Eigen::Mat
 	return sols;
 }
 
-int r6pSingleLin(double * X, double * u, double * ud, int direction, double r0, int maxpow, double * vout, double * wout, double * Cout, double * tout) {
+int r6pSingleLin(Eigen::Matrix<double,3,6> & X, Eigen::Matrix<double,2,6> & u, Eigen::Matrix<double,2,6> & ud, int direction, double r0, int maxpow, RSSinglelinCameraPoseVector * results) {
 
 	Eigen::VectorXd coeffs(1260);
 	Eigen::MatrixXd CC = Eigen::MatrixXd::Zero(99, 163);
@@ -79,10 +80,10 @@ int r6pSingleLin(double * X, double * u, double * ud, int direction, double r0, 
 	std::vector<Eigen::Vector3d> v;
 
 	if (direction == 0) {
-		R6P_cayley_linearized_prepare_data_C(X, u, ud, r0, solver_input);
+		R6P_cayley_linearized_prepare_data_C(X.data(), u.data(), ud.data(), r0, solver_input);
 	}
 	else {
-		R6P_cayley_linearized_prepare_data_y_C(X, u, ud, r0, solver_input);
+		R6P_cayley_linearized_prepare_data_y_C(X.data(), u.data(), ud.data(), r0, solver_input);
 	}
 
 	Eigen::Map<Eigen::MatrixXd> data(solver_input, 15, 165);
@@ -151,26 +152,24 @@ int r6pSingleLin(double * X, double * u, double * ud, int direction, double r0, 
 		Eigen::VectorXd b(18);
 		for (int k = 0; k < 6; k++)
 		{
-			double dr = u[k * 2 + direction] - r0;
+			double dr = u(k * 2 + direction) - r0;
 			Eigen::Matrix<double, 3, 9> temp;
-			temp << -dr*X_(R*Eigen::Vector3d(X[k * 3], X[k * 3 + 1], X[k * 3 + 2])), Eigen::Matrix3d::Identity(), dr*Eigen::Matrix3d::Identity();
-			A.block(k * 3, 0, 3, 9) = X_(Eigen::Vector3d(u[k * 2], u[k * 2 + 1], 1))*temp;
-			b.segment(k * 3, 3) = -X_(Eigen::Vector3d(u[k * 2], u[k * 2 + 1], 1))*R*Eigen::Vector3d(X[k * 3], X[k * 3 + 1], X[k * 3 + 2]);
+			temp << -dr*X_(R*Eigen::Vector3d(X(k * 3), X(k * 3 + 1), X(k * 3 + 2))), Eigen::Matrix3d::Identity(), dr*Eigen::Matrix3d::Identity();
+			A.block(k * 3, 0, 3, 9) = X_(Eigen::Vector3d(u(k * 2), u(k * 2 + 1), 1))*temp;
+			b.segment(k * 3, 3) = -X_(Eigen::Vector3d(u(k * 2), u(k * 2 + 1), 1))*R*Eigen::Vector3d(X(k * 3), X(k * 3 + 1), X(k * 3 + 2));
 		}
 
 		Eigen::VectorXd wCt = A.householderQr().solve(b);
-		memcpy(vout+j*3,eax.data(),3*sizeof(double));
-		memcpy(wout+j*3,wCt.segment(0,3).data(),3*sizeof(double));
-		memcpy(Cout+j*3,wCt.segment(3,3).data(),3*sizeof(double));
-		memcpy(tout+j*3,wCt.segment(6,3).data(),3*sizeof(double));
+
+		results->push_back({eax, wCt.segment(3,3), wCt.segment(0,3), wCt.segment(6,3), 1, 0});
 
 	}
 	
 
-	return nroots;
+	return 0;
 
 }
 
-int r6pSingleLin(double * X, double * u, int direction, double r0, int maxpow, double * Rout, double * wout, double * Cout, double * tout) {
-	return r6pSingleLin(X, u, u, direction, r0, maxpow, Rout, wout, Cout, tout);
+int r6pSingleLin(Eigen::Matrix<double,3,6> X, Eigen::Matrix<double,2,6> u, int direction, double r0, int maxpow, RSSinglelinCameraPoseVector * results) {
+	return r6pSingleLin(X, u, u, direction, r0, maxpow, results);
 }

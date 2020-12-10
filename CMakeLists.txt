@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
+  set(CMAKE_BUILD_TYPE Debug)
 endif()
 
 
@@ -39,7 +39,7 @@ include_directories(
 
 
 add_library(rnp STATIC
-  c++/r6pDoubleLin.cpp c++/r6pSingleLin.cpp c++/sturm.cpp c++/utils.cpp
+  c++/r6pDoubleLin.cpp c++/r6pSingleLin.cpp c++/R7Pf.cpp c++/R7Pfr.cpp c++/iterative.cpp c++/rnp.cpp c++/sturm.cpp c++/utils.cpp 
 )
 
 target_include_directories(rnp PRIVATE .)
@@ -54,6 +54,41 @@ install(TARGETS rnp
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION arch
     PUBLIC_HEADER DESTINATION include)
+
+enable_testing()
+
+ADD_EXECUTABLE(test_r6p_doublelin tests/test_r6p_doublelin.cpp)
+ADD_EXECUTABLE(test_r6p_singlelin tests/test_r6p_doublelin.cpp)
+ADD_EXECUTABLE(test_r7pf tests/test_r7pf.cpp)
+ADD_EXECUTABLE(test_r7pfr tests/test_r7pfr.cpp)
+ADD_EXECUTABLE(test_rs_projections tests/test_rs_projections.cpp)
+
+ADD_TEST(test_r6p_doublelin test_r6p_doublelin)
+ADD_TEST(test_r6p_singlelin test_r6p_doublelin)
+ADD_TEST(test_r7pf test_r7pf)
+ADD_TEST(test_r7pfr test_r7pfr)
+ADD_TEST(test_rs_projections test_rs_projections)
+
+target_include_directories(test_r6p_doublelin PRIVATE .)
+target_include_directories(test_r6p_doublelin PUBLIC ${EIGEN_INCLUDE_DIRS})
+target_link_libraries (test_r6p_doublelin Eigen3::Eigen rnp)
+
+target_include_directories(test_r6p_singlelin PRIVATE .)
+target_include_directories(test_r6p_singlelin PUBLIC ${EIGEN_INCLUDE_DIRS})
+target_link_libraries (test_r6p_singlelin Eigen3::Eigen rnp)
+
+target_include_directories(test_r7pf PRIVATE .)
+target_include_directories(test_r7pf PUBLIC ${EIGEN_INCLUDE_DIRS})
+target_link_libraries (test_r7pf Eigen3::Eigen rnp)
+
+target_include_directories(test_r7pfr PRIVATE .)
+target_include_directories(test_r7pfr PUBLIC ${EIGEN_INCLUDE_DIRS})
+target_link_libraries (test_r7pfr Eigen3::Eigen rnp)
+
+target_include_directories(test_rs_projections PRIVATE .)
+target_include_directories(test_rs_projections PUBLIC ${EIGEN_INCLUDE_DIRS})
+target_link_libraries (test_rs_projections Eigen3::Eigen rnp)
+
 
 if(Matlab_FOUND)
     matlab_add_mex(
