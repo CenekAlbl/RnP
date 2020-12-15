@@ -144,6 +144,12 @@ return 0;
 
 
 int R7PfrLin(Eigen::Matrix<double,7,3> X, Eigen::Matrix<double,7,2> u, Eigen::Vector3d vk, double r0, RSDoublelinCameraPoseVector * results){
+int direction = 0;
+
+if(direction == 1){
+  
+
+}
 
 
 results->reserve(10);

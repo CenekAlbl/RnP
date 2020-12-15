@@ -100,21 +100,14 @@ endif(Matlab_FOUND)
 
 if(Python_FOUND)
 
-    set(SETUP_PY_IN "${CMAKE_SOURCE_DIR}/cython/setup.py.in")
-    set(SETUP_PY "${CMAKE_SOURCE_DIR}/cython/setup.py")
+    add_subdirectory(extern/pybind11)
 
-    #set(PY_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/build/pytimestamp")
+    pybind11_add_module(pyrnp c++/python_bindings.cpp)
 
-    configure_file(${SETUP_PY_IN} ${SETUP_PY})
+    target_include_directories(pyrnp PRIVATE .)
 
-    add_custom_command(OUTPUT "rnppy" 
-        COMMAND ${Python_EXECUTABLE} ${CMAKE_SOURCE_DIR}/cython/setup.py build_ext --inplace --include-dirs "${CMAKE_SOURCE_DIR}/c++/" --library-dirs "${CMAKE_CURRENT_BINARY_DIR}"
-        DEPENDS rnp)
+    target_include_directories(pyrnp PUBLIC ${EIGEN_INCLUDE_DIRS})
 
-    target_link_libraries (rnp)
-
-    add_custom_target(rnppyt ALL DEPENDS rnppy rnp)
-
-    install(CODE "execute_process(COMMAND ${Python_EXECUTABLE} ${SETUP_PY} install)")
+    target_link_libraries(pyrnp PRIVATE Eigen3::Eigen rnp)
 
 endif(Python_FOUND)
