@@ -2631,7 +2631,7 @@ void setupEliminationTemplate(Eigen::VectorXd data, Eigen::MatrixXd & C) {
 		}
 }
 
-int R6P_cayley_linearized_prepare_data_C(double * Xdata, double * udata, double * ud, double r0, double * solver_input){
+int R6P_cayley_linearized_prepare_data_C(double const * Xdata, double const * udata, double const * ud, double r0, double * solver_input){
 double t1[240];
 double X1_1 = Xdata[0]; 
 double X2_1 = Xdata[1]; 
@@ -18400,7 +18400,7 @@ return 0;
 }
 
 
-int R6P_cayley_linearized_prepare_data_y_C(double * Xdata, double * udata, double * ud, double r0, double * solver_input){
+int R6P_cayley_linearized_prepare_data_y_C(double const * Xdata, double const * udata, double const * ud, double r0, double * solver_input){
 double t1[240];
 double X1_1 = Xdata[0]; 
 double X2_1 = Xdata[1]; 

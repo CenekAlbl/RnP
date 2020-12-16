@@ -45,16 +45,16 @@ int rsDoubleLinProjection(const Eigen::Vector3d &X, Eigen::Vector2d &u, const Ei
 
 int rsSingleLinProjection(const Eigen::Vector3d &X, Eigen::Vector2d &u, const Eigen::Vector3d &v, const Eigen::Vector3d &C, const Eigen::Vector3d &w, const Eigen::Vector3d &t, double f, double rd, double r0, int direction);
 
-int R7PfLin(Eigen::Matrix<double,7,3> X, Eigen::Matrix<double,7,2> u, Eigen::Vector3d vk, double r0, RSDoublelinCameraPoseVector * results);
+int R7PfLin(const Eigen::Matrix<double,7,3> X, const Eigen::Matrix<double,7,2> u, const Eigen::Vector3d vk, double r0, RSDoublelinCameraPoseVector * results);
 
-int R7PfrLin(Eigen::Matrix<double,7,3> X, Eigen::Matrix<double,7,2> u, Eigen::Vector3d vk, double r0, RSDoublelinCameraPoseVector * results);
+int R7PfrLin(const Eigen::Matrix<double,7,3> X, const Eigen::Matrix<double,7,2> u, const Eigen::Vector3d vk, double r0, RSDoublelinCameraPoseVector * results);
 
 template<typename Model, int (*Solver)(Eigen::Matrix<double,7,3> X, Eigen::Matrix<double,7,2> u, Eigen::Vector3d vk, double r0, std::vector<Model> * results)>
-int iterativeRnP(Eigen::Matrix<double,7,3> X, Eigen::Matrix<double,7,2> u, Eigen::Vector3d vk, int sampleSize, double r0, int maxIter, Model & result);
+int iterativeRnP(const Eigen::Matrix<double,7,3> X, const Eigen::Matrix<double,7,2> u, const Eigen::Vector3d vk, int sampleSize, double r0, int maxIter, Model & result);
 
-int r6pSingleLin(Eigen::Matrix<double,3,6> & X, Eigen::Matrix<double,2,6> & u, int direction, double r0, int maxpow, RSSinglelinCameraPoseVector * results);
+int r6pSingleLin(const Eigen::Matrix<double,3,6> & X, const Eigen::Matrix<double,2,6> & u, int direction, double r0, int maxpow, RSSinglelinCameraPoseVector * results);
 
-int r6pDoubleLin(Eigen::Matrix<double,3,6> & X, Eigen::Matrix<double,2,6> & u, int direction, double r0, RSDoublelinCameraPoseVector * results);
+int r6pDoubleLin(const Eigen::Matrix<double,3,6> & X, const Eigen::Matrix<double,2,6> & u, int direction, double r0, RSDoublelinCameraPoseVector * results);
 
 
 double calcErrAlgebraicRnPFocalRadialDoubleLin(Eigen::Vector3d vr, Eigen::Vector3d Cr, Eigen::Vector3d wr, Eigen::Vector3d tr, double f, double rd, double r0, Eigen::MatrixXd X, Eigen::MatrixXd u, int direction);
