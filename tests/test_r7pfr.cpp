@@ -45,19 +45,50 @@ bool testR7Pfr(){
     }
 
     // run R7Pf
-    int res =  iterativeRnP<RSDoublelinCameraPose, R7PfrLin>(X.transpose(), u.transpose(), gt.v, n_points, r0, maxIter, model);
+    int res =  iterativeRnP<RSDoublelinCameraPose, R7PfrLin>(X, u, gt.v, n_points, r0, direction, maxIter, model);
 
     
 
     if(res == ERR_NO_SOLUTION){
-        std::cout << "R7Pfr returned no solution\n";
+        std::cout << "R7Pfr, direction 0, returned no solution\n";
         passed = false;
     }else if(res == WARN_NO_CONVERGENCE){
-        std::cout << "R7Pfr  did not converge\n";
+        std::cout << "R7Pfr, direction 0,  did not converge\n";
         passed = false;
     }else{
         if(!isPoseApproxEqual(gt,model)){
-            std::cout << "R7Pfr returned bad pose\n";
+            std::cout << "R7Pfr, direction 0, returned bad pose\n";
+        passed = false;
+        }
+    }
+
+    // Now test with other RS direction
+    direction = 1;
+
+    // create exact 2D projections
+    for (int i = 0; i < n_points; i++)
+    {
+        Eigen::Vector2d temp;
+        if(rsDoubleLinProjection(X.col(i), temp, gt.v, gt.C, gt.w, gt.t,  gt.f,  gt.rd,  r0,  direction)){
+            std::cout << "R7Pfr test failed due to projection function\n";
+            return 0;
+        }
+        u.col(i) = temp;
+    }
+
+    // run R7Pf
+    res =  iterativeRnP<RSDoublelinCameraPose, R7PfrLin>(X, u, gt.v, n_points, r0, direction, maxIter, model);
+
+
+    if(res == ERR_NO_SOLUTION){
+        std::cout << "R7Pfr , direction 1, returned no solution\n";
+        passed = false;
+    }else if(res == WARN_NO_CONVERGENCE){
+        std::cout << "R7Pfr, direction 1,  did not converge\n";
+        passed = false;
+    }else{
+        if(!isPoseApproxEqual(gt,model)){
+            std::cout << "R7Pfr, direction 1, returned bad pose\n";
         passed = false;
         }
     }

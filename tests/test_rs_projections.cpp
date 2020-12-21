@@ -45,7 +45,7 @@ bool testRSDoubleLinProjection(){
     }
 
     // now test with random X and C 
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 10; i++)
     {
         X = Eigen::Vector3d::Random();
         C = Eigen::Vector3d::Random();
@@ -57,7 +57,7 @@ bool testRSDoubleLinProjection(){
     }
 
     // now test with random  v
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 10; i++)
     {
         X << 0, 0, 2;
         C << 0,0,0;
@@ -70,7 +70,7 @@ bool testRSDoubleLinProjection(){
     }
 
     // now test with random w
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 10; i++)
     {
         X << 0, 0, 2;
         C << 0,0,0;
@@ -85,7 +85,7 @@ bool testRSDoubleLinProjection(){
 
     // now test with random rd
     std::uniform_real_distribution<double> rd_gen(-0.5, 0);
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 10; i++)
     {
         X << 0, 0, 2;
         C << 0,0,0;
@@ -101,7 +101,7 @@ bool testRSDoubleLinProjection(){
 
     // now test reasonable values of X,C,t,v,w,f,rd
     std::uniform_real_distribution<double> f_gen(1000, 1500);
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 10; i++)
     {
         f = f_gen(random_engine);
         X << Eigen::Vector3d::Random() + Eigen::Vector3d(0,0,5);
@@ -118,7 +118,7 @@ bool testRSDoubleLinProjection(){
     }
 
     //now verify that the solution is accurate
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 10; i++)
     {
         f = f_gen(random_engine);
         X << Eigen::Vector3d::Random() + Eigen::Vector3d(0,0,5);
@@ -139,7 +139,7 @@ bool testRSDoubleLinProjection(){
 
     //now verify that the solution is accurate for other RS direction
     direction = 1;
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 10; i++)
     {
         f = f_gen(random_engine);
         X << Eigen::Vector3d::Random() + Eigen::Vector3d(0,0,5);
@@ -199,7 +199,7 @@ bool testRSSingleLinProjection(){
     }
 
     // now test with random X and C 
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 10; i++)
     {
         X = Eigen::Vector3d::Random();
         C = Eigen::Vector3d::Random();
@@ -211,7 +211,7 @@ bool testRSSingleLinProjection(){
     }
 
     // now test with random  v
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 10; i++)
     {
         X << 0, 0, 2;
         C << 0,0,0;
@@ -224,7 +224,7 @@ bool testRSSingleLinProjection(){
     }
 
     // now test with random w
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 10; i++)
     {
         X << 0, 0, 2;
         C << 0,0,0;
@@ -239,7 +239,7 @@ bool testRSSingleLinProjection(){
 
     // now test with random rd
     std::uniform_real_distribution<double> rd_gen(-0.5, 0);
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 10; i++)
     {
         X << 0, 0, 2;
         C << 0,0,0;
@@ -255,7 +255,7 @@ bool testRSSingleLinProjection(){
 
     // now test reasonable values of X,C,t,v,w,f,rd
     std::uniform_real_distribution<double> f_gen(1000, 1500);
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 10; i++)
     {
         f = f_gen(random_engine);
         X << Eigen::Vector3d::Random() + Eigen::Vector3d(0,0,5);
@@ -272,7 +272,7 @@ bool testRSSingleLinProjection(){
     }
 
     //now verify that the solution is accurate
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 10; i++)
     {
         f = f_gen(random_engine);
         X << Eigen::Vector3d::Random() + Eigen::Vector3d(0,0,5);
@@ -293,7 +293,7 @@ bool testRSSingleLinProjection(){
 
     //now verify that the solution is accurate for other RS direction
     direction = 1;
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 10; i++)
     {
         f = f_gen(random_engine);
         X << Eigen::Vector3d::Random() + Eigen::Vector3d(0,0,5);

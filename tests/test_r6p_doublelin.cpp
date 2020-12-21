@@ -43,10 +43,10 @@ bool testR6PDoubleLin(){
 
     int res = r6pDoubleLin(X, u, direction, r0, &results);
     if(res == ERR_NO_SOLUTION){
-        std::cout << "R6P doublelin for random X all params 0 and f = 1 returned no solution\n";
+        std::cout << "R6P doublelin, RS in x direction, for random X all params 0 and f = 1 returned no solution\n";
         passed = false;
     }else if(res == WARN_NO_CONVERGENCE){
-        std::cout << "R6P doublelin for random X all params 0 and f = 1 did not converge\n";
+        std::cout << "R6P doublelin, RS in x direction, for random X all params 0 and f = 1 did not converge\n";
         passed = false;
     }else{
         bool ident = false;
@@ -57,7 +57,7 @@ bool testR6PDoubleLin(){
             }
         }
         if(!ident){
-            std::cout << "R6P doublelin for random X all params 0 and f = 1 returned bad pose\n";
+            std::cout << "R6P doublelin, RS in x direction, for random X all params 0 and f = 1 returned bad pose\n";
             passed = false;
         }
     }
@@ -77,7 +77,7 @@ bool testR6PDoubleLin(){
     {
         Eigen::Vector2d temp;
         if(rsDoubleLinProjection(X.col(i), temp, gt.v, gt.C, gt.w, gt.t,  gt.f,  gt.rd,  r0,  direction)){
-            std::cout << "R6P doublelin test failed due to projection function\n";
+            std::cout << "R6P doublelin, RS in x direction, test failed due to projection function\n";
             return 0;
         }
         u.col(i) = temp;
@@ -86,10 +86,10 @@ bool testR6PDoubleLin(){
     res = r6pDoubleLin(X, u, direction, r0, &results);
 
     if(res == ERR_NO_SOLUTION){
-        std::cout << "R6P doublelin for random X all params 0 and f = 1 returned no solution\n";
+        std::cout << "R6P doublelin, RS in x direction, for random X all params 0 and f = 1 returned no solution\n";
         passed = false;
     }else if(res == WARN_NO_CONVERGENCE){
-        std::cout << "R6P doublelin for random X all params 0 and f = 1 did not converge\n";
+        std::cout << "R6P doublelin, RS in x direction, for random X all params 0 and f = 1 did not converge\n";
         passed = false;
     }else{
         bool ident = false;
@@ -100,7 +100,43 @@ bool testR6PDoubleLin(){
             }
         }
         if(!ident){
-            std::cout << "R6P doublelin for random X all params 0 and f = 1 returned bad pose\n";
+            std::cout << "R6P doublelin, RS in x direction, for random X all params 0 and f = 1 returned bad pose\n";
+            passed = false;
+        }
+    }
+
+    // Now check other RS direction
+    direction = 1;
+
+    // create exact 2D projections
+    for (int i = 0; i < n_points; i++)
+    {
+        Eigen::Vector2d temp;
+        if(rsDoubleLinProjection(X.col(i), temp, gt.v, gt.C, gt.w, gt.t,  gt.f,  gt.rd,  r0,  direction)){
+            std::cout << "R6P doublelin, RS in y direction, test failed due to projection function\n";
+            return 0;
+        }
+        u.col(i) = temp;
+    }
+
+    res = r6pDoubleLin(X, u, direction, r0, &results);
+
+    if(res == ERR_NO_SOLUTION){
+        std::cout << "R6P doublelin, RS in y direction, for random X all params 0 and f = 1 returned no solution\n";
+        passed = false;
+    }else if(res == WARN_NO_CONVERGENCE){
+        std::cout << "R6P doublelin, RS in y direction, for random X all params 0 and f = 1 did not converge\n";
+        passed = false;
+    }else{
+        bool ident = false;
+        for (auto const& model: results)
+        {
+            if(isPoseApproxEqual(gt,model)){
+                ident = true;
+            }
+        }
+        if(!ident){
+            std::cout << "R6P doublelin, RS in y direction, for random X all params 0 and f = 1 returned bad pose\n";
             passed = false;
         }
     }

@@ -58,13 +58,13 @@ install(TARGETS rnp
 enable_testing()
 
 ADD_EXECUTABLE(test_r6p_doublelin tests/test_r6p_doublelin.cpp)
-ADD_EXECUTABLE(test_r6p_singlelin tests/test_r6p_doublelin.cpp)
+ADD_EXECUTABLE(test_r6p_singlelin tests/test_r6p_singlelin.cpp)
 ADD_EXECUTABLE(test_r7pf tests/test_r7pf.cpp)
 ADD_EXECUTABLE(test_r7pfr tests/test_r7pfr.cpp)
 ADD_EXECUTABLE(test_rs_projections tests/test_rs_projections.cpp)
 
 ADD_TEST(test_r6p_doublelin test_r6p_doublelin)
-ADD_TEST(test_r6p_singlelin test_r6p_doublelin)
+ADD_TEST(test_r6p_singlelin test_r6p_singlelin)
 ADD_TEST(test_r7pf test_r7pf)
 ADD_TEST(test_r7pfr test_r7pfr)
 ADD_TEST(test_rs_projections test_rs_projections)

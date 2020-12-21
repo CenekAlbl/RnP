@@ -170,6 +170,6 @@ int r6pSingleLin(const  Eigen::Matrix<double,3,6> & X, const  Eigen::Matrix<doub
 
 }
 
-int r6pSingleLin(const Eigen::Matrix<double,3,6> X, const Eigen::Matrix<double,2,6> u, int direction, double r0, int maxpow, RSSinglelinCameraPoseVector * results) {
+int r6pSingleLin(const Eigen::Matrix<double,3,6> &X, const Eigen::Matrix<double,2,6> &u, int direction, double r0, int maxpow, RSSinglelinCameraPoseVector * results) {
 	return r6pSingleLin(X, u, u, direction, r0, maxpow, results);
 }

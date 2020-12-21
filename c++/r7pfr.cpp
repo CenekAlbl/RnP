@@ -143,13 +143,10 @@ return 0;
 }
 
 
-int R7PfrLin(const Eigen::Matrix<double,7,3> X, const Eigen::Matrix<double,7,2> u, const Eigen::Vector3d vk, double r0, RSDoublelinCameraPoseVector * results){
-int direction = 0;
+int R7PfrLin(const Eigen::Matrix<double,3,7> &Xin, const Eigen::Matrix<double,2,7> &uin, const Eigen::Vector3d &vk, double r0, RSDoublelinCameraPoseVector * results){
 
-if(direction == 1){
-  
-
-}
+Eigen::MatrixXd X =  Xin.transpose();
+Eigen::MatrixXd u =  uin.transpose();
 
 
 results->reserve(10);

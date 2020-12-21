@@ -6,7 +6,10 @@
 
 
 
-int R7PfLin(const Eigen::Matrix<double,7,3> X, const Eigen::Matrix<double,7,2> u, const Eigen::Vector3d vk, double r0, RSDoublelinCameraPoseVector * results){
+int R7PfLin(const Eigen::Matrix<double,3,7> & Xin, const Eigen::Matrix<double,2,7> & uin, const Eigen::Vector3d & vk, double r0, RSDoublelinCameraPoseVector * results){
+
+Eigen::MatrixXd X =  Xin.transpose();
+Eigen::MatrixXd u =  uin.transpose();
 
 Eigen::MatrixXd A = Eigen::MatrixXd::Zero(7,11);
 
@@ -85,7 +88,7 @@ for (int i = 0; i < ff.rows(); i++)
         C(1) = a*n(7,0)+b*n(7,1)+c*n(7,2)+n(7,3);
         t(0) = a*n(8,0)+b*n(8,1)+c*n(8,2)+n(8,3);
         t(1) = a*n(9,0)+b*n(9,1)+c*n(9,2)+n(9,3);
-
+      
         results->push_back({v, C, w, t, f, 0});
     }
 }

@@ -28,7 +28,13 @@ double calcErrAlgebraicRnPFocalRadialSingleLin(Eigen::Vector3d vr, Eigen::Vector
         Eigen::Matrix3d I = Eigen::Matrix3d::Identity();
         double rs = (u(direction,i)-r0);
         Eigen::Matrix3d Rv;
-        Rv = Eigen::AngleAxis<double>(vr.norm(), vr).toRotationMatrix();
+        double n = vr.norm();
+        if(n < 1e-15){
+            Rv = Eigen::AngleAxis<double>(0, (Eigen::Vector3d() << 1,0,0).finished()).toRotationMatrix();
+        }else{
+            Rv = Eigen::AngleAxis<double>(n, vr/n).toRotationMatrix();
+        }
+        
         Eigen::Vector3d eq = X_(uh)*K*((I + rs*X_(wr))*Rv*X.col(i) + Cr + rs*tr);
         err += eq.cwiseAbs().sum();
     }
@@ -77,8 +83,13 @@ int rsSingleLinProjection(const Eigen::Vector3d &X, Eigen::Vector2d &u, const Ei
     K.diagonal() << f, f, 1;
     // Eigen::Matrix3d Rv = Eigen::Matrix3d::Identity() + X_(v); 
     Eigen::Matrix3d Rv;
-    Rv = Eigen::AngleAxis<double>(v.norm(), v).toRotationMatrix();
-    
+    double n = v.norm();
+    if(n < 1e-15){
+        Rv = Eigen::AngleAxis<double>(0, (Eigen::Vector3d() << 1,0,0).finished()).toRotationMatrix();
+    }else{
+        Rv = Eigen::AngleAxis<double>(n, v/n).toRotationMatrix();
+    }
+
     uh = K* ( Rv * X + C );
     u = uh.head(2)/uh(2);
 
@@ -114,7 +125,7 @@ bool isPoseApproxEqual(T pose1, T pose2){
     err += (pose1.w-pose2.w).norm();
     err += std::abs(pose1.f-pose2.f)/std::max(pose1.f,1.0);
     err += std::abs(pose1.rd-pose2.rd);
-
+    std::cout << "err: " << err << "\n";
     return err < 1e-6;
 }
 
