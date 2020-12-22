@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Debug)
+  set(CMAKE_BUILD_TYPE Release)
 endif()
 
 
@@ -39,7 +39,7 @@ include_directories(
 
 
 add_library(rnp STATIC
-  c++/r6pDoubleLin.cpp c++/r6pSingleLin.cpp c++/r7pf.cpp c++/r7pfr.cpp c++/iterative.cpp c++/rnp.cpp c++/sturm.cpp c++/utils.cpp 
+  c++/r6p_2lin.cpp c++/r6p_1lin.cpp c++/r7pf.cpp c++/r7pfr.cpp c++/r6p_iter.cpp c++/iterative.cpp c++/rnp.cpp c++/sturm.cpp c++/utils.cpp
 )
 
 target_include_directories(rnp PRIVATE .)
@@ -57,25 +57,33 @@ install(TARGETS rnp
 
 enable_testing()
 
-ADD_EXECUTABLE(test_r6p_doublelin tests/test_r6p_doublelin.cpp)
-ADD_EXECUTABLE(test_r6p_singlelin tests/test_r6p_singlelin.cpp)
+ADD_EXECUTABLE(test_r6p_2lin tests/test_r6p_2lin.cpp)
+ADD_EXECUTABLE(test_r6p_1lin tests/test_r6p_1lin.cpp)
+ADD_EXECUTABLE(test_r6p_iter tests/test_r6p_iter.cpp)
 ADD_EXECUTABLE(test_r7pf tests/test_r7pf.cpp)
 ADD_EXECUTABLE(test_r7pfr tests/test_r7pfr.cpp)
 ADD_EXECUTABLE(test_rs_projections tests/test_rs_projections.cpp)
 
-ADD_TEST(test_r6p_doublelin test_r6p_doublelin)
-ADD_TEST(test_r6p_singlelin test_r6p_singlelin)
+ADD_EXECUTABLE(benchmark c++/benchmark.cpp)
+
+ADD_TEST(test_r6p_2lin test_r6p_2lin)
+ADD_TEST(test_r6p_1lin test_r6p_1lin)
+ADD_TEST(test_r6p_iter test_r6p_iter)
 ADD_TEST(test_r7pf test_r7pf)
 ADD_TEST(test_r7pfr test_r7pfr)
 ADD_TEST(test_rs_projections test_rs_projections)
 
-target_include_directories(test_r6p_doublelin PRIVATE .)
-target_include_directories(test_r6p_doublelin PUBLIC ${EIGEN_INCLUDE_DIRS})
-target_link_libraries (test_r6p_doublelin Eigen3::Eigen rnp)
+target_include_directories(test_r6p_2lin PRIVATE .)
+target_include_directories(test_r6p_2lin PUBLIC ${EIGEN_INCLUDE_DIRS})
+target_link_libraries (test_r6p_2lin Eigen3::Eigen rnp)
 
-target_include_directories(test_r6p_singlelin PRIVATE .)
-target_include_directories(test_r6p_singlelin PUBLIC ${EIGEN_INCLUDE_DIRS})
-target_link_libraries (test_r6p_singlelin Eigen3::Eigen rnp)
+target_include_directories(test_r6p_1lin PRIVATE .)
+target_include_directories(test_r6p_1lin PUBLIC ${EIGEN_INCLUDE_DIRS})
+target_link_libraries (test_r6p_1lin Eigen3::Eigen rnp)
+
+target_include_directories(test_r6p_iter PRIVATE .)
+target_include_directories(test_r6p_iter PUBLIC ${EIGEN_INCLUDE_DIRS})
+target_link_libraries (test_r6p_iter Eigen3::Eigen rnp)
 
 target_include_directories(test_r7pf PRIVATE .)
 target_include_directories(test_r7pf PUBLIC ${EIGEN_INCLUDE_DIRS})
@@ -88,6 +96,10 @@ target_link_libraries (test_r7pfr Eigen3::Eigen rnp)
 target_include_directories(test_rs_projections PRIVATE .)
 target_include_directories(test_rs_projections PUBLIC ${EIGEN_INCLUDE_DIRS})
 target_link_libraries (test_rs_projections Eigen3::Eigen rnp)
+
+target_include_directories(benchmark PRIVATE .)
+target_include_directories(benchmark PUBLIC ${EIGEN_INCLUDE_DIRS})
+target_link_libraries (benchmark Eigen3::Eigen rnp)
 
 
 if(Matlab_FOUND)

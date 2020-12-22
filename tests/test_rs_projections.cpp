@@ -29,7 +29,7 @@ bool testRSDoubleLinProjection(){
     int res;
 
     // test all zero input, should return NaN
-    res = rsDoubleLinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
+    res = rs2LinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
     if(!std::isnan(u(0)) || !std::isnan(u(1))){
         passed = false;
         std::cout << "Error: when passing all 0 should return NaN\n";
@@ -38,7 +38,7 @@ bool testRSDoubleLinProjection(){
     // now test with focal length 1 and non-zero X, should return a number
     f = 1;
     X << 1,1,1;
-    res = rsDoubleLinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
+    res = rs2LinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
     if(std::isnan(u(0)) || std::isnan(u(1))){
         passed = false;
         std::cout << "Error: when passing f = 1 should not return NaN\n";
@@ -49,7 +49,7 @@ bool testRSDoubleLinProjection(){
     {
         X = Eigen::Vector3d::Random();
         C = Eigen::Vector3d::Random();
-        res = rsDoubleLinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
+        res = rs2LinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
         if(std::isnan(u(0)) || std::isnan(u(1)) || res){
             passed = false;
             std::cout << "Error: projection failed for random X and C\n";
@@ -62,7 +62,7 @@ bool testRSDoubleLinProjection(){
         X << 0, 0, 2;
         C << 0,0,0;
         v = Eigen::Vector3d::Random();
-        res = rsDoubleLinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
+        res = rs2LinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
         if(std::isnan(u(0)) || std::isnan(u(1)) || res){
             passed = false;
             std::cout << "Error: projection failed for random v\n";
@@ -76,7 +76,7 @@ bool testRSDoubleLinProjection(){
         C << 0,0,0;
         v << 0,0,0;
         w = Eigen::Vector3d::Random();
-        res = rsDoubleLinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
+        res = rs2LinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
         if(std::isnan(u(0)) || std::isnan(u(1)) || res){
             passed = false;
             std::cout << "Error: projection failed for random w\n";
@@ -92,7 +92,7 @@ bool testRSDoubleLinProjection(){
         v << 0,0,0;
         w << 0,0,0;
         rd = rd_gen(random_engine);
-        res = rsDoubleLinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
+        res = rs2LinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
         if(std::isnan(u(0)) || std::isnan(u(1)) || res){
             passed = false;
             std::cout << "Error: projection failed for random rd\n";
@@ -110,7 +110,7 @@ bool testRSDoubleLinProjection(){
         w << Eigen::Vector3d::Random()/f/10;
         t << Eigen::Vector3d::Random()/f/10;
         rd = rd_gen(random_engine)/f/f;
-        res = rsDoubleLinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
+        res = rs2LinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
         if(std::isnan(u(0)) || std::isnan(u(1)) || res){
             passed = false;
             std::cout << "Error: projection failed for random inputs\n";
@@ -127,7 +127,7 @@ bool testRSDoubleLinProjection(){
         w << Eigen::Vector3d::Random()/f/10;
         t << Eigen::Vector3d::Random()/f/10;
         rd = rd_gen(random_engine)/f/f;
-        res = rsDoubleLinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
+        res = rs2LinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
         double err =  calcErrAlgebraicRnPFocalRadialDoubleLin(v, C, w, t, f, rd, 0, X, u, direction);
         if(err > 1e-8){
             passed = false;
@@ -148,7 +148,7 @@ bool testRSDoubleLinProjection(){
         w << Eigen::Vector3d::Random()/f/10;
         t << Eigen::Vector3d::Random()/f/10;
         rd = rd_gen(random_engine)/f/f;
-        res = rsDoubleLinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
+        res = rs2LinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
         double err =  calcErrAlgebraicRnPFocalRadialDoubleLin(v, C, w, t, f, rd, 0, X, u, direction);
         if(err > 1e-8){
             passed = false;
@@ -183,7 +183,7 @@ bool testRSSingleLinProjection(){
     int res;
 
     // test all zero input, should return NaN
-    res = rsSingleLinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
+    res = rs1LinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
     if(!std::isnan(u(0)) || !std::isnan(u(1))){
         passed = false;
         std::cout << "Error: when passing all 0 should return NaN\n";
@@ -192,7 +192,7 @@ bool testRSSingleLinProjection(){
     // now test with focal length 1 and non-zero X, should return a number
     f = 1;
     X << 1,1,1;
-    res = rsSingleLinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
+    res = rs1LinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
     if(std::isnan(u(0)) || std::isnan(u(1))){
         passed = false;
         std::cout << "Error: when passing f = 1 should not return NaN\n";
@@ -203,7 +203,7 @@ bool testRSSingleLinProjection(){
     {
         X = Eigen::Vector3d::Random();
         C = Eigen::Vector3d::Random();
-        res = rsSingleLinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
+        res = rs1LinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
         if(std::isnan(u(0)) || std::isnan(u(1)) || res){
             passed = false;
             std::cout << "Error: projection failed for random X and C\n";
@@ -216,7 +216,7 @@ bool testRSSingleLinProjection(){
         X << 0, 0, 2;
         C << 0,0,0;
         v = Eigen::Vector3d::Random();
-        res = rsSingleLinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
+        res = rs1LinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
         if(std::isnan(u(0)) || std::isnan(u(1)) || res){
             passed = false;
             std::cout << "Error: projection failed for random v\n";
@@ -230,7 +230,7 @@ bool testRSSingleLinProjection(){
         C << 0,0,0;
         v << 0,0,0;
         w = Eigen::Vector3d::Random();
-        res = rsSingleLinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
+        res = rs1LinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
         if(std::isnan(u(0)) || std::isnan(u(1)) || res){
             passed = false;
             std::cout << "Error: projection failed for random w\n";
@@ -246,7 +246,7 @@ bool testRSSingleLinProjection(){
         v << 0,0,0;
         w << 0,0,0;
         rd = rd_gen(random_engine);
-        res = rsSingleLinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
+        res = rs1LinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
         if(std::isnan(u(0)) || std::isnan(u(1)) || res){
             passed = false;
             std::cout << "Error: projection failed for random rd\n";
@@ -264,7 +264,7 @@ bool testRSSingleLinProjection(){
         w << Eigen::Vector3d::Random()/f/10;
         t << Eigen::Vector3d::Random()/f/10;
         rd = rd_gen(random_engine)/f/f;
-        res = rsSingleLinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
+        res = rs1LinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
         if(std::isnan(u(0)) || std::isnan(u(1)) || res){
             passed = false;
             std::cout << "Error: projection failed for random inputs\n";
@@ -281,7 +281,7 @@ bool testRSSingleLinProjection(){
         w << Eigen::Vector3d::Random()/f/10;
         t << Eigen::Vector3d::Random()/f/10;
         rd = rd_gen(random_engine)/f/f;
-        res = rsSingleLinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
+        res = rs1LinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
         double err =  calcErrAlgebraicRnPFocalRadialSingleLin(v, C, w, t, f, rd, 0, X, u, direction);
         if(err > 1e-8){
             passed = false;
@@ -302,7 +302,7 @@ bool testRSSingleLinProjection(){
         w << Eigen::Vector3d::Random()/f/10;
         t << Eigen::Vector3d::Random()/f/10;
         rd = rd_gen(random_engine)/f/f;
-        res = rsSingleLinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
+        res = rs1LinProjection(X, u, v, C, w, t,  f,  rd,  r0,  direction);
         double err =  calcErrAlgebraicRnPFocalRadialSingleLin(v, C, w, t, f, rd, 0, X, u, direction);
         if(err > 1e-8){
             passed = false;

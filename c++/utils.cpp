@@ -79,7 +79,7 @@ void colEchelonForm(Eigen::MatrixXd &M, std::list<int> &b)
 	}
 }
 
-void inputSwitchDirection(Eigen::Matrix<double,3,7> &X, Eigen::Matrix<double,2,7> &u){
+void inputSwitchDirection(Eigen::MatrixXd &X, Eigen::MatrixXd &u){
 	Eigen::VectorXd temp1 = X.row(0);
 	Eigen::VectorXd temp2 = u.row(0);
 	X.row(0) = X.row(1);

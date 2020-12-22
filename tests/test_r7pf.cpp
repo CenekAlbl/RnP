@@ -5,8 +5,8 @@
 #include <random>
 
 bool testR7Pf(){
-    Eigen::Matrix<double,3,7> X;
-    Eigen::Matrix<double,2,7> u;
+    Eigen::MatrixXd X(3,7);
+    Eigen::MatrixXd u(2,7);
     double r0 = 0;
     int direction = 0;
     int n_points = 7;
@@ -26,7 +26,7 @@ bool testR7Pf(){
     gt.w << 0,0,0;
     gt.C << 0,0,0;
     gt.t << 0,0,0;
-    X = Eigen::Matrix<double,3,7>::Random();
+    X = Eigen::MatrixXd::Random(3,7);
     gt.f = 1;
     gt.rd = 0;
 
@@ -35,7 +35,7 @@ bool testR7Pf(){
     for (int i = 0; i < n_points; i++)
     {
         Eigen::Vector2d temp;
-        if(rsDoubleLinProjection(X.col(i), temp, gt.v, gt.C, gt.w, gt.t,  gt.f,  gt.rd,  r0,  direction)){
+        if(rs2LinProjection(X.col(i), temp, gt.v, gt.C, gt.w, gt.t,  gt.f,  gt.rd,  r0,  direction)){
             std::cout << "R7Pf test failed due to projection function\n";
             return 0;
         }
@@ -45,7 +45,7 @@ bool testR7Pf(){
     RSDoublelinCameraPose model;
 
     // run R7Pf
-    int res =  iterativeRnP<RSDoublelinCameraPose, R7PfLin>(X, u, gt.v, n_points, r0, direction, maxIter, model);
+    int res =  iterativeRnP<RSDoublelinCameraPose, R7PfIter>(X, u, gt.v, n_points, r0, direction, maxIter, model);
 
     if(res == ERR_NO_SOLUTION){
         std::cout << "R7Pf for random X, direction 0, all params 0 and f = 1 returned no solution\n";
@@ -74,7 +74,7 @@ bool testR7Pf(){
     for (int i = 0; i < n_points; i++)
     {
         Eigen::Vector2d temp;
-        if(rsDoubleLinProjection(X.col(i), temp, gt.v, gt.C, gt.w, gt.t,  gt.f,  gt.rd,  r0,  direction)){
+        if(rs2LinProjection(X.col(i), temp, gt.v, gt.C, gt.w, gt.t,  gt.f,  gt.rd,  r0,  direction)){
             std::cout << "R7Pf test failed due to projection function\n";
             return 0;
         }
@@ -82,7 +82,7 @@ bool testR7Pf(){
     }
 
     // run R7Pf
-    res =  iterativeRnP<RSDoublelinCameraPose, R7PfLin>(X, u, gt.v, n_points, r0, direction, maxIter, model);
+    res =  iterativeRnP<RSDoublelinCameraPose, R7PfIter>(X, u, gt.v, n_points, r0, direction, maxIter, model);
 
     if(res == ERR_NO_SOLUTION){
         std::cout << "R7Pf for random X, direction 0, random params and f = 1 returned no solution\n";
@@ -104,7 +104,7 @@ bool testR7Pf(){
     for (int i = 0; i < n_points; i++)
     {
         Eigen::Vector2d temp;
-        if(rsDoubleLinProjection(X.col(i), temp, gt.v, gt.C, gt.w, gt.t,  gt.f,  gt.rd,  r0,  direction)){
+        if(rs2LinProjection(X.col(i), temp, gt.v, gt.C, gt.w, gt.t,  gt.f,  gt.rd,  r0,  direction)){
             std::cout << "R7Pf test failed due to projection function\n";
             return 0;
         }
@@ -118,7 +118,7 @@ bool testR7Pf(){
     std::cout << "w: \n" << gt.w << "\n"; 
 
     // run R7Pf
-    res =  iterativeRnP<RSDoublelinCameraPose, R7PfLin>(X, u, gt.v, n_points, r0, direction, maxIter, model);
+    res =  iterativeRnP<RSDoublelinCameraPose, R7PfIter>(X, u, gt.v, n_points, r0, direction, maxIter, model);
 
     std::cout << "res: \n";
     std::cout << "C: \n" << model.C << "\n"; 

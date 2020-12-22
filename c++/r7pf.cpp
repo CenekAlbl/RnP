@@ -6,7 +6,7 @@
 
 
 
-int R7PfLin(const Eigen::Matrix<double,3,7> & Xin, const Eigen::Matrix<double,2,7> & uin, const Eigen::Vector3d & vk, double r0, RSDoublelinCameraPoseVector * results){
+int R7PfIter(const Eigen::MatrixXd & Xin, const Eigen::MatrixXd & uin, const Eigen::Vector3d & vk, double r0, RSDoublelinCameraPoseVector * results){
 
 Eigen::MatrixXd X =  Xin.transpose();
 Eigen::MatrixXd u =  uin.transpose();

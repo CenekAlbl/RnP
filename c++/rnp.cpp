@@ -42,7 +42,7 @@ double calcErrAlgebraicRnPFocalRadialSingleLin(Eigen::Vector3d vr, Eigen::Vector
 }
 
 
-int rsDoubleLinProjection(const Eigen::Vector3d &X, Eigen::Vector2d &u, const Eigen::Vector3d &v, const Eigen::Vector3d &C, const Eigen::Vector3d &w, const Eigen::Vector3d &t, double f, double rd, double r0, int direction){
+int rs2LinProjection(const Eigen::Vector3d &X, Eigen::Vector2d &u, const Eigen::Vector3d &v, const Eigen::Vector3d &C, const Eigen::Vector3d &w, const Eigen::Vector3d &t, double f, double rd, double r0, int direction){
     // First initiate u with a global shutter projection
     Eigen::Matrix<double,3,4> P;
     Eigen::Vector3d uh;
@@ -76,7 +76,7 @@ int rsDoubleLinProjection(const Eigen::Vector3d &X, Eigen::Vector2d &u, const Ei
     
 }
 
-int rsSingleLinProjection(const Eigen::Vector3d &X, Eigen::Vector2d &u, const Eigen::Vector3d &v, const Eigen::Vector3d &C, const Eigen::Vector3d &w, const Eigen::Vector3d &t, double f, double rd, double r0, int direction){
+int rs1LinProjection(const Eigen::Vector3d &X, Eigen::Vector2d &u, const Eigen::Vector3d &v, const Eigen::Vector3d &C, const Eigen::Vector3d &w, const Eigen::Vector3d &t, double f, double rd, double r0, int direction){
     Eigen::Matrix<double,3,4> P;
     Eigen::Vector3d uh;
     Eigen::Matrix3d K = Eigen::Matrix3d::Zero();
@@ -125,7 +125,6 @@ bool isPoseApproxEqual(T pose1, T pose2){
     err += (pose1.w-pose2.w).norm();
     err += std::abs(pose1.f-pose2.f)/std::max(pose1.f,1.0);
     err += std::abs(pose1.rd-pose2.rd);
-    std::cout << "err: " << err << "\n";
     return err < 1e-6;
 }
 

@@ -1,8 +1,8 @@
 #include "rnp.h"
 #include <iostream>
 
-template<typename Model, int (*Solver)(const Eigen::Matrix<double,3,7> &X, const Eigen::Matrix<double,2,7> &u, const Eigen::Vector3d &vk, double r0, std::vector<Model> * results)>
-int iterativeRnP(Eigen::Matrix<double,3,7> &X, Eigen::Matrix<double,2,7> &u, Eigen::Vector3d vk, int sampleSize, double r0, int direction, int maxIter, Model & result){
+template<typename Model, int (*Solver)(const Eigen::MatrixXd &X, const Eigen::MatrixXd &u, const Eigen::Vector3d &vk, double r0, std::vector<Model> * results)>
+int iterativeRnP(Eigen::MatrixXd &X, Eigen::MatrixXd &u, Eigen::Vector3d vk, int sampleSize, double r0, int direction, int maxIter, Model & result){
     int notFound = 1;
     int k = 0;
 
@@ -48,5 +48,6 @@ int iterativeRnP(Eigen::Matrix<double,3,7> &X, Eigen::Matrix<double,2,7> &u, Eig
 }
 
 
-template int iterativeRnP<RSDoublelinCameraPose,R7PfrLin>(Eigen::Matrix<double,3,7> &X, Eigen::Matrix<double,2,7> &u, Eigen::Vector3d vk, int sampleSize, double r0, int direction, int maxIter, RSDoublelinCameraPose & result);
-template int iterativeRnP<RSDoublelinCameraPose,R7PfLin>(Eigen::Matrix<double,3,7> &X, Eigen::Matrix<double,2,7> &u, Eigen::Vector3d vk, int sampleSize, double r0, int direction, int maxIter, RSDoublelinCameraPose & result);
+template int iterativeRnP<RSDoublelinCameraPose,R7PfrIter>(Eigen::MatrixXd &X, Eigen::MatrixXd &u, Eigen::Vector3d vk, int sampleSize, double r0, int direction, int maxIter, RSDoublelinCameraPose & result);
+template int iterativeRnP<RSDoublelinCameraPose,R7PfIter>(Eigen::MatrixXd &X, Eigen::MatrixXd &u, Eigen::Vector3d vk, int sampleSize, double r0, int direction, int maxIter, RSDoublelinCameraPose & result);
+template int iterativeRnP<RSDoublelinCameraPose,R6PIter>(Eigen::MatrixXd &X, Eigen::MatrixXd &u, Eigen::Vector3d vk, int sampleSize, double r0, int direction, int maxIter, RSDoublelinCameraPose & result);

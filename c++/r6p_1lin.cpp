@@ -1,4 +1,4 @@
-#include "prepareSingleLin.h"
+#include "prepare_1lin.h"
 #include "utils.h"
 #include "danilevsky.h"
 #include "sturm.h"
@@ -70,7 +70,7 @@ std::vector<Eigen::Vector3d> solve_xy_from_AM(double * z, int nroots, Eigen::Mat
 	return sols;
 }
 
-int r6pSingleLin(const  Eigen::Matrix<double,3,6> & X, const  Eigen::Matrix<double,2,6> & u, const Eigen::Matrix<double,2,6> & ud, int direction, double r0, int maxpow, RSSinglelinCameraPoseVector * results) {
+int r6pSingleLin(const  Eigen::MatrixXd & X, const  Eigen::MatrixXd & u, const Eigen::MatrixXd & ud, int direction, double r0, int maxpow, RSSinglelinCameraPoseVector * results) {
 
 	Eigen::VectorXd coeffs(1260);
 	Eigen::MatrixXd CC = Eigen::MatrixXd::Zero(99, 163);
@@ -170,6 +170,6 @@ int r6pSingleLin(const  Eigen::Matrix<double,3,6> & X, const  Eigen::Matrix<doub
 
 }
 
-int r6pSingleLin(const Eigen::Matrix<double,3,6> &X, const Eigen::Matrix<double,2,6> &u, int direction, double r0, int maxpow, RSSinglelinCameraPoseVector * results) {
+int R6P1Lin(const Eigen::MatrixXd &X, const Eigen::MatrixXd &u, int direction, double r0, int maxpow, RSSinglelinCameraPoseVector * results) {
 	return r6pSingleLin(X, u, u, direction, r0, maxpow, results);
 }

@@ -1,9 +1,9 @@
 
-#include "prepareDoubleLin.h"
+#include "prepare_2lin.h"
 #include "utils.h"
 #include "rnp.h"
 
-int r6pDoubleLin(const Eigen::Matrix<double,3,6> & X, const Eigen::Matrix<double,2,6> & u, int direction, double r0, RSDoublelinCameraPoseVector * results){
+int R6P2Lin(const Eigen::MatrixXd & X, const Eigen::MatrixXd & u, int direction, double r0, RSDoublelinCameraPoseVector * results){
 	Eigen::MatrixXd H(12, 22);
 	double X_1, X_2, X_3, r, c, c0;
 	bool planar = false;
