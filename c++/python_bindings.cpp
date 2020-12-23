@@ -17,6 +17,15 @@ PYBIND11_MODULE(pyrnp, m) {
         .def_readwrite("f", &RSDoublelinCameraPose::f)
         .def_readwrite("rd", &RSDoublelinCameraPose::rd);
 
+    py::class_<RSSinglelinCameraPose>(m, "RSSinglelinCameraPose")
+        .def(py::init<>())
+        .def_readwrite("v", &RSSinglelinCameraPose::v)
+        .def_readwrite("C", &RSSinglelinCameraPose::C)
+        .def_readwrite("w", &RSSinglelinCameraPose::w)
+        .def_readwrite("t", &RSSinglelinCameraPose::t)
+        .def_readwrite("f", &RSSinglelinCameraPose::f)
+        .def_readwrite("rd", &RSSinglelinCameraPose::rd);
+
     m.def(
         "R7Pf",
         [](Eigen::MatrixXd X,
@@ -51,8 +60,8 @@ PYBIND11_MODULE(pyrnp, m) {
         "R6P2Lin",
         [](const Eigen::MatrixXd &X,
             const Eigen::MatrixXd &u, 
-            int direction,
-            double r0
+            double r0,
+            int direction
             ) {
             RSDoublelinCameraPoseVector * results;
             int res =  R6P2Lin(X, u, direction, r0, results);
@@ -61,15 +70,30 @@ PYBIND11_MODULE(pyrnp, m) {
         "R6P double linearized - calibrated camera RS absolute pose from 6 correspondences, both rotations linearized, R needs to be close to I");
 
     m.def(
-        "R6P2Lin",
+        "R6P1Lin",
         [](const Eigen::MatrixXd &X,
             const Eigen::MatrixXd &u, 
-            int direction,
-            double r0
+            double r0,
+            int direction
             ) {
             RSSinglelinCameraPoseVector * results;
             int res =  R6P1Lin(X, u, direction, r0, 2, results);
             return results;
+            },
+        "R6P single linearized - calibrated camera RS absolute pose from 6 correspondences, only rotational velocity linearized, direct solution, no initialization needed");
+
+    m.def(
+        "R6PIter",
+        [](Eigen::MatrixXd &X,
+            Eigen::MatrixXd &u, 
+            const Eigen::Vector3d &vk,
+            double r0,
+            int direction,
+            int maxIter
+            ) {
+            RSDoublelinCameraPose model;
+            int res =  iterativeRnP<RSDoublelinCameraPose, R6PIter>(X, u, vk, 6, r0, direction, maxIter, model);
+            return model;
             },
         "R6P single linearized - calibrated camera RS absolute pose from 6 correspondences, only rotational velocity linearized, direct solution, no initialization needed");
 
