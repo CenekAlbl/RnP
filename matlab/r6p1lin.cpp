@@ -6,7 +6,7 @@
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 	if(nrhs<2||nlhs<4){
-		mexErrMsgTxt("Minimum call: [R,w,C,t] = R6P_cayley(X,u)\n X: 3x6 matrix of 3D points \n u: 2x6 matrix of 2D projections\n");
+		mexErrMsgTxt("Minimum call: [R,w,C,t] = R6P1lin(X,u)\n X: 3x6 matrix of 3D points \n u: 2x6 matrix of 2D projections\n");
 		return;
 	}
 	const mwSize	*dims = mxGetDimensions(prhs[0]);
@@ -38,41 +38,54 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		maxpow = *mxGetPr(prhs[5]);
 	}
 
-	double *X = mxGetPr(prhs[0]);
-	double *u = mxGetPr(prhs[1]);
+	//double *X = mxGetPr(prhs[0]);
+	//double *u = mxGetPr(prhs[1]);
+
+	Eigen::MatrixXd X = Eigen::Map<Eigen::MatrixXd>(mxGetPr(prhs[0]),3,6);
+	Eigen::MatrixXd u = Eigen::Map<Eigen::MatrixXd>(mxGetPr(prhs[1]),2,6);
 	
 	
 	int nsols;
-	plhs[0] = mxCreateDoubleMatrix(9,64, mxREAL);
-	plhs[1] = mxCreateDoubleMatrix(3,64, mxREAL);
-	plhs[2] = mxCreateDoubleMatrix(3,64, mxREAL);
-	plhs[3] = mxCreateDoubleMatrix(3,64, mxREAL);
-	double R[9*64];
-	double C[3*64];
-	double t[3*64];
-	double w[3*64];
-
-	double *w_out, *t_out, *C_out, *R_out;
 
 
-	nsols = r6pSingleLin(X, u, direction, r0, maxpow, R, w, C, t);
+	double *w_out, *t_out, *C_out, *v_out;
+
+	RSSinglelinCameraPoseVector results;
+
+
+	R6P1Lin(X, u, direction, r0, maxpow, &results);
+
+	nsols = 0;
+
+	for(auto res : results){
+		nsols++;
+	}
 	
-	plhs[0] = mxCreateDoubleMatrix(9, nsols, mxREAL);
+	plhs[0] = mxCreateDoubleMatrix(3, nsols, mxREAL);
 	plhs[1] = mxCreateDoubleMatrix(3, nsols, mxREAL);
 	plhs[2] = mxCreateDoubleMatrix(3, nsols, mxREAL);
 	plhs[3] = mxCreateDoubleMatrix(3, nsols, mxREAL);
 	
 
-	R_out = mxGetPr(plhs[0]);
+	v_out = mxGetPr(plhs[0]);
 	w_out = mxGetPr(plhs[1]);
 	C_out = mxGetPr(plhs[2]);	
 	t_out = mxGetPr(plhs[3]);
+
+	for(auto res : results){
+		std::memcpy(w_out, res.w.data(), 3 * sizeof(double));
+		std::memcpy(t_out, res.t.data(), 3 * sizeof(double));
+		std::memcpy(C_out, res.C.data(), 3 * sizeof(double));
+		std::memcpy(v_out, res.v.data(), 3 * sizeof(double));
+		w_out += 3;
+		t_out += 3;
+		C_out += 3;
+		v_out += 3;
+					
+	}
 	
 	
-	std::memcpy(w_out, w, nsols * 3 * sizeof(double));
-	std::memcpy(t_out, t, nsols * 3 * sizeof(double));
-	std::memcpy(C_out, C, nsols * 3 * sizeof(double));
-	std::memcpy(R_out, R, nsols * 9 * sizeof(double));
+	
 
 }
 	

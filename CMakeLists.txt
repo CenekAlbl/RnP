@@ -16,17 +16,6 @@ if (EIGEN_FOUND)
   include_directories(${EIGEN_INCLUDE_DIRS})
 endif (EIGEN_FOUND)
 
-if(NOT DEFINED Python_EXECUTABLE)
-    find_package (Python COMPONENTS Interpreter Development)
-    if(Python_FOUND)
-        message(WARNING "Python ${Python_VERSION} found and will be used. If you want to use a different version, please specify Python_EXECUTABLE variable")
-    else()
-        message(WARNING "Python was not found automatically. If you want to compile the python bindings, please specify the Python_EXECUTABLE variable")
-    endif(Python_FOUND)
-else()
-    message(WARNING "Python executable specified by user: ${Python_EXECUTABLE}")
-    set(Python_FOUND True)
-endif()
 
 find_package(Matlab COMPONENTS MX_LIBRARY MEX_COMPILER)
 
@@ -104,22 +93,53 @@ target_link_libraries (benchmark Eigen3::Eigen rnp)
 
 if(Matlab_FOUND)
     matlab_add_mex(
-        NAME r6pSingleLin
-        SRC "matlab/r6pSingleLinMex.cpp"
+        NAME r6p1lin
+        SRC "matlab/r6p1lin.cpp"
+        LINK_TO rnp
+    )
+    matlab_add_mex(
+        NAME r6p2lin
+        SRC "matlab/r6p2lin.cpp"
+        LINK_TO rnp
+    )
+    matlab_add_mex(
+	    NAME r6pIter
+	SRC "matlab/r6pIter.cpp"
+        LINK_TO rnp
+    )
+    matlab_add_mex(
+        NAME r7pf
+        SRC "matlab/r7pf.cpp"
+        LINK_TO rnp
+    )
+    matlab_add_mex(
+        NAME r7pfr
+        SRC "matlab/r7pfr.cpp"
         LINK_TO rnp
     )
 endif(Matlab_FOUND)
 
-if(Python_FOUND)
+if(PYTHON_BINDINGS)
 
-    add_subdirectory(extern/pybind11)
+	if(NOT DEFINED Python_EXECUTABLE)
+	    find_package (Python COMPONENTS Interpreter Development)
+	    if(Python_FOUND)
+		message(WARNING "Python ${Python_VERSION} found and will be used. If you want to use a different version, please specify Python_EXECUTABLE variable")
+	    else()
+		message(WARNING "Python was not found automatically. If you want to compile the python bindings, please specify the Python_EXECUTABLE variable")
+	    endif(Python_FOUND)
+	else()
+	    message(WARNING "Python executable specified by user: ${Python_EXECUTABLE}")
+	endif()
 
-    pybind11_add_module(pyrnp c++/python_bindings.cpp)
+    	add_subdirectory(extern/pybind11)
 
-    target_include_directories(pyrnp PRIVATE .)
+	pybind11_add_module(pyrnp EXCLUDE_FROM_ALL c++/python_bindings.cpp)
 
-    target_include_directories(pyrnp PUBLIC ${EIGEN_INCLUDE_DIRS})
+	target_include_directories(pyrnp PRIVATE .)
 
-    target_link_libraries(pyrnp PRIVATE Eigen3::Eigen rnp)
+	target_include_directories(pyrnp PUBLIC ${EIGEN_INCLUDE_DIRS})
 
-endif(Python_FOUND)
+	target_link_libraries(pyrnp PRIVATE Eigen3::Eigen rnp)
+
+endif(PYTHON_BINDINGS)
