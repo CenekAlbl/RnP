@@ -63,8 +63,8 @@ PYBIND11_MODULE(pyrnp, m) {
             double r0,
             int direction
             ) {
-            RSDoublelinCameraPoseVector * results;
-            int res =  R6P2Lin(X, u, direction, r0, results);
+            RSDoublelinCameraPoseVector results;
+            int res =  R6P2Lin(X, u, direction, r0, &results);
             return results;
             },
         "R6P double linearized - calibrated camera RS absolute pose from 6 correspondences, both rotations linearized, R needs to be close to I");
@@ -76,8 +76,8 @@ PYBIND11_MODULE(pyrnp, m) {
             double r0,
             int direction
             ) {
-            RSSinglelinCameraPoseVector * results;
-            int res =  R6P1Lin(X, u, direction, r0, 2, results);
+            RSSinglelinCameraPoseVector results;
+            int res =  R6P1Lin(X, u, direction, r0, 2, &results);
             return results;
             },
         "R6P single linearized - calibrated camera RS absolute pose from 6 correspondences, only rotational velocity linearized, direct solution, no initialization needed");

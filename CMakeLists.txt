@@ -17,11 +17,6 @@ if (EIGEN_FOUND)
 endif (EIGEN_FOUND)
 
 
-find_package(Matlab COMPONENTS MX_LIBRARY MEX_COMPILER)
-
-
-
-
 include_directories(
     c++
 )
@@ -90,34 +85,38 @@ target_include_directories(benchmark PRIVATE .)
 target_include_directories(benchmark PUBLIC ${EIGEN_INCLUDE_DIRS})
 target_link_libraries (benchmark Eigen3::Eigen rnp)
 
+if(MATLAB_BINDINGS)
 
-if(Matlab_FOUND)
-    matlab_add_mex(
-        NAME r6p1lin
-        SRC "matlab/r6p1lin.cpp"
-        LINK_TO rnp
-    )
-    matlab_add_mex(
-        NAME r6p2lin
-        SRC "matlab/r6p2lin.cpp"
-        LINK_TO rnp
-    )
-    matlab_add_mex(
-	    NAME r6pIter
-	SRC "matlab/r6pIter.cpp"
-        LINK_TO rnp
-    )
-    matlab_add_mex(
-        NAME r7pf
-        SRC "matlab/r7pf.cpp"
-        LINK_TO rnp
-    )
-    matlab_add_mex(
-        NAME r7pfr
-        SRC "matlab/r7pfr.cpp"
-        LINK_TO rnp
-    )
-endif(Matlab_FOUND)
+    find_package(Matlab COMPONENTS MX_LIBRARY MEX_COMPILER)
+    
+    if(Matlab_FOUND)
+        matlab_add_mex(
+            NAME r6p1lin
+            SRC "matlab/r6p1lin.cpp"
+            LINK_TO rnp
+        )
+        matlab_add_mex(
+            NAME r6p2lin
+            SRC "matlab/r6p2lin.cpp"
+            LINK_TO rnp
+        )
+        matlab_add_mex(
+            NAME r6pIter
+        SRC "matlab/r6pIter.cpp"
+            LINK_TO rnp
+        )
+        matlab_add_mex(
+            NAME r7pf
+            SRC "matlab/r7pf.cpp"
+            LINK_TO rnp
+        )
+        matlab_add_mex(
+            NAME r7pfr
+            SRC "matlab/r7pfr.cpp"
+            LINK_TO rnp
+        )
+    endif(Matlab_FOUND)
+endif(MATLAB_BINDINGS)
 
 if(PYTHON_BINDINGS)
 

@@ -71,7 +71,6 @@ std::vector<Eigen::Vector3d> solve_xy_from_AM(double * z, int nroots, Eigen::Mat
 }
 
 int r6pSingleLin(const  Eigen::MatrixXd & X, const  Eigen::MatrixXd & u, const Eigen::MatrixXd & ud, int direction, double r0, int maxpow, RSSinglelinCameraPoseVector * results) {
-
 	Eigen::VectorXd coeffs(1260);
 	Eigen::MatrixXd CC = Eigen::MatrixXd::Zero(99, 163);
 
@@ -118,10 +117,10 @@ int r6pSingleLin(const  Eigen::MatrixXd & X, const  Eigen::MatrixXd & u, const E
 		AM.row(j) = RR.row(AM_ind[j]);
 	}
 
-	Eigen::EigenSolver<Eigen::MatrixXd> es;
 	double p[65];
 	charpoly_danilevsky(AM, p);
-	//printf("danilevsky done\n");
+
+
 	int order = 64;
 	double proots[65];
 	double roots[64];
@@ -130,7 +129,8 @@ int r6pSingleLin(const  Eigen::MatrixXd & X, const  Eigen::MatrixXd & u, const E
 		proots[order - j] = p[j];
 	}
 	find_real_roots_sturm(proots, order, roots, &nroots, maxpow, 0);
-	//printf("sturm done\n");
+
+
 	Eigen::MatrixXcd sols(3, nroots);
 
 	v = solve_xy_from_AM(roots, nroots, AM);
@@ -145,7 +145,9 @@ int r6pSingleLin(const  Eigen::MatrixXd & X, const  Eigen::MatrixXd & u, const E
 		q.segment(1, 3) = v[j];
 		q.normalize();
 		quat2R(q, R);
+
 		Eigen::AngleAxis<double> eaxn = Eigen::AngleAxis<double>(R);
+
 		Eigen::Vector3d eax = eaxn.axis()*eaxn.angle();
 		//std::cout << R;
 		Eigen::MatrixXd A(18, 9);
@@ -155,16 +157,20 @@ int r6pSingleLin(const  Eigen::MatrixXd & X, const  Eigen::MatrixXd & u, const E
 			double dr = u(k * 2 + direction) - r0;
 			Eigen::Matrix<double, 3, 9> temp;
 			temp << -dr*X_(R*Eigen::Vector3d(X(k * 3), X(k * 3 + 1), X(k * 3 + 2))), Eigen::Matrix3d::Identity(), dr*Eigen::Matrix3d::Identity();
+
 			A.block(k * 3, 0, 3, 9) = X_(Eigen::Vector3d(u(k * 2), u(k * 2 + 1), 1))*temp;
+
 			b.segment(k * 3, 3) = -X_(Eigen::Vector3d(u(k * 2), u(k * 2 + 1), 1))*R*Eigen::Vector3d(X(k * 3), X(k * 3 + 1), X(k * 3 + 2));
+
 		}
 
 		Eigen::VectorXd wCt = A.householderQr().solve(b);
 
+
 		results->push_back({eax, wCt.segment(3,3), wCt.segment(0,3), wCt.segment(6,3), 1, 0});
 
 	}
-	
+
 
 	return 0;
 
