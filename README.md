@@ -92,11 +92,12 @@ You can also run the benchmark to see the runtime of each algorithm on your mach
 
 Naturally, you should do it after compilation in the default RELEASE mode, not DEBUG.
 
-### Python bindings
+### Python and Matlab bindings
 
-If you want to compile with Python bindings then:
+If you want to compile the Python bindings then:
 
     cmake .. -DPYTHON_BINDINGS=1
+    make pyrnp
 
 If you want to compile with MATLAB bindings then:
 
